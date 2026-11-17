@@ -456,11 +456,11 @@ a.work-row,a.card__open{text-decoration:none;color:inherit}
 .phone-split.is-open .phone-split__bubbles{pointer-events:auto}
 .bubble{display:flex;align-items:center;justify-content:center;width:clamp(3.25rem,5vw,4.25rem);height:clamp(3.25rem,5vw,4.25rem);border-radius:50%;transition:box-shadow .35s,filter .35s}
 .bubble svg{width:1rem;height:1rem;transition:transform .35s var(--ease)}
-.bubble--call{background:var(--accent);color:var(--on-accent);box-shadow:0 4px 18px color-mix(in srgb, var(--accent) 30%, transparent)}
+.bubble--call{background:#455CE9;color:#F8F6F2;box-shadow:0 4px 18px rgba(69,92,233,.3)}
 .bubble--wa{background:#25D366;color:#F8F6F2;box-shadow:0 4px 18px rgba(37,211,102,.3)}
 .bubble:hover,.bubble:focus-visible{filter:brightness(1.12)}
 .bubble:hover svg,.bubble:focus-visible svg{transform:scale(1.15)}
-.bubble--call:hover,.bubble--call:focus-visible{box-shadow:0 8px 28px color-mix(in srgb, var(--accent) 45%, transparent)}
+.bubble--call:hover,.bubble--call:focus-visible{box-shadow:0 8px 28px rgba(69,92,233,.45)}
 .bubble--wa:hover,.bubble--wa:focus-visible{box-shadow:0 8px 28px rgba(37,211,102,.45)}
 .footer__bottom{display:flex;flex-wrap:wrap;gap:1.5rem;justify-content:space-between;align-items:center;margin-top:clamp(4rem,9vw,7rem);padding-top:2rem;border-top:1px solid var(--line-soft)}
 .footer__col .k{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.18em;color:var(--faint);margin-bottom:.4rem}
