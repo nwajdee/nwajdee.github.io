@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /src/
+Disallow: /maintenance.html
+Disallow: /404.html
+
+Sitemap: https://nwajdee.github.io/sitemap.xml

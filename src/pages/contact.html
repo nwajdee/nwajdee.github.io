@@ -1,0 +1,53 @@
+<div class="page" id="page-contact" data-page="contact">
+    <section class="contact wrap">
+      <div class="sec-label micro" data-reveal>Contact</div>
+      <h1 class="contact__title" data-reveal>Let's work together.</h1>
+      <p class="contact__sub" data-reveal>Tell me what you're building or selling. I'll reply with whether I'm the right fit, a rough plan, and a timeline - usually within a day.</p>
+      <div class="contact-grid">
+        <div data-reveal>
+          <form id="contactForm" novalidate>
+            <div class="form-row">
+              <div class="field"><label for="cf-name">Your name</label><input id="cf-name" name="name" type="text" placeholder="Jane Doe" required /><span class="err">Please add your name.</span></div>
+              <div class="field"><label for="cf-email">Email</label><input id="cf-email" name="email" type="email" placeholder="jane@brand.com" required /><span class="err">Add a valid email.</span></div>
+            </div>
+            <div class="form-row">
+              <div class="field"><label for="cf-type">Project type</label>
+                <select id="cf-type" name="type" required>
+                  <option value="" disabled selected>Select one</option>
+                  <option>Ecommerce store / funnel</option>
+                  <option>Ad creative &amp; media buying</option>
+                  <option>Video content</option>
+                  <option>Web app / SaaS build</option>
+                  <option>Something else</option>
+                </select><span class="err">Pick a project type.</span></div>
+              <div class="field"><label for="cf-budget">Budget range</label>
+                <select id="cf-budget" name="budget">
+                  <option value="" disabled selected>Optional</option>
+                  <option>Under $1k</option><option>$1k - $5k</option><option>$5k - $15k</option><option>$15k+</option><option>Not sure yet</option>
+                </select></div>
+            </div>
+            <div class="field"><label for="cf-msg">What are you building?</label><textarea id="cf-msg" name="message" placeholder="A sentence or two about the brand, the goal, and where you're stuck." required></textarea><span class="err">Tell me a little about the project.</span></div>
+            <span class="magnetic" data-magnetic><button type="submit" class="btn btn--solid"><span class="btn__bg"></span><span>Send message</span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg></button></span>
+          </form>
+          <div class="form-success" id="formSuccess" role="status">
+            <div class="form-success__icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg></div>
+            <h3>Message sent.</h3>
+            <p>Thanks - I'll get back to you within a day. In the meantime, feel free to look through the work.</p>
+          </div>
+        </div>
+        <aside class="contact__aside" data-reveal>
+          <div class="contact__avail"><span class="dot"></span> Available for new projects</div>
+          <div class="contact__block"><div class="k">Email</div><a href="mailto:hello@jordannwachukwu.com" data-contact-email>hello@jordannwachukwu.com</a></div>
+          <div class="contact__block"><div class="k">Phone / WhatsApp</div><a href="https://wa.me/2348111417027" target="_blank" rel="noopener" data-contact-phone>+234 811 141 7027</a></div>
+          <div class="contact__block"><div class="k">Socials</div>
+            <div class="footer__socials" style="margin-top:.4rem">
+              <a href="https://www.instagram.com/jordannwachukwu" target="_blank" rel="noopener" data-social>Instagram</a>
+              <a href="https://www.x.com/jordanified" target="_blank" rel="noopener" data-social>X</a>
+              <a href="https://www.linkedin.com/in/jordannwachukwu" target="_blank" rel="noopener" data-social>LinkedIn</a>
+            </div>
+          </div>
+          <div class="contact__block"><div class="k">Based in</div><p>Aba, Nigeria · <span id="contactClock" class="mono">--:--</span> WAT</p></div>
+        </aside>
+      </div>
+    </section>
+  </div>
