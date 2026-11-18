@@ -241,7 +241,7 @@ section{position:relative}
 .hero__role p{margin:0;font-size:clamp(1.2rem,2.2vw,2rem);line-height:1.25;font-weight:500}
 @media(max-width:760px){
   .hero{min-height:75svh}
-  .hero__name{font-size:9.5vw;top:50%;bottom:auto;transform:translateY(-50%)}
+  .hero__name{font-size:13vw;top:50%;bottom:auto;transform:translateY(-50%)}
   .hero__pill{top:auto;bottom:clamp(4.5rem,12vw,7rem);gap:1rem;padding-right:.7em;font-size:.8rem}
   .hero__role{top:auto;bottom:clamp(4.5rem,12vw,7rem);right:var(--pad)}
   .hero__role .arr{top:calc(-1rem - 20px)}
@@ -261,7 +261,7 @@ section{position:relative}
 .intro__side{position:relative}
 .intro__small{color:var(--muted);max-width:14em;font-size:clamp(1.05rem,1.4vw,1.3rem);line-height:1.55;padding-top:.5em}
 .intro__cta{position:absolute;left:0;bottom:0}
-@media(max-width:820px){.intro__grid{grid-template-columns:1fr}.intro__big{max-width:none;text-align:center}.intro__side{display:flex;flex-direction:column;align-items:center;text-align:center}.intro__cta{position:static;margin-top:2rem}}
+@media(max-width:820px){.intro__grid{grid-template-columns:1fr}.intro__big{max-width:none;text-align:center}.intro__side{display:flex;flex-direction:column;align-items:center;text-align:center}.intro__small{max-width:none}.intro__cta{position:static;margin-top:2rem}}
 
 /* magnetic button */
 .magnetic{display:inline-block;will-change:transform}
