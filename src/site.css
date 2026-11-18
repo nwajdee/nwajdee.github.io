@@ -245,7 +245,7 @@ section{position:relative}
   /* black pill collapses to just the spinning globe on the right */
   .hero__pill{top:auto;bottom:clamp(4.5rem,12vw,7rem);left:auto;right:var(--pad);gap:0;padding:0;background:transparent;height:auto;min-width:0;font-size:.8rem}
   .hero__pill-text{display:none}
-  .hero__pill-globe{width:clamp(48px,14vw,72px);height:clamp(48px,14vw,72px)}
+  .hero__pill-globe{width:clamp(48px,14vw,72px);height:clamp(48px,14vw,72px);background:transparent}
   /* role label: moved left, scaled up to span > half viewport */
   .hero__role{left:var(--pad);right:auto;top:auto;bottom:clamp(4.5rem,12vw,7rem);text-align:left}
   .hero__role .arr{top:calc(-.6rem - clamp(22px,5.5vw,34px));width:clamp(22px,5.5vw,34px);height:clamp(22px,5.5vw,34px)}
