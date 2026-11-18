@@ -819,7 +819,7 @@ html[data-theme="light"] .post[data-cat="Japa"]{--pc:#0B3D2E}
 .post__title{font-size:clamp(2rem,4.4vw,3.4rem);font-weight:700;letter-spacing:-.03em;line-height:1.05;margin-top:1.4rem}
 .post__dek{margin-top:1.2rem;color:var(--muted);font-size:clamp(1.05rem,1.6vw,1.3rem);line-height:1.55}
 .post__byline{display:flex;align-items:center;gap:1rem;margin-top:2rem;padding-top:1.6rem;border-top:1px solid var(--line-soft);flex-wrap:wrap}
-.post__avatar{width:44px;height:44px;border-radius:50%;background:url("/assets/hero-portrait-v2.jpg") center/cover;flex-shrink:0}
+.post__avatar{width:44px;height:44px;border-radius:50%;background:url("/assets/hero-portrait-v2.jpg") 55% 7%/170% auto;flex-shrink:0}
 .post__by{font-weight:600;font-size:.95rem}
 .post__role{font-size:.64rem;color:var(--faint);text-transform:uppercase;letter-spacing:.1em}
 .post__body{margin-top:2.6rem}
