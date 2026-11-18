@@ -443,9 +443,29 @@
     startNameMarquee();
   }
 
-  /* ---------- contact form (client-side demo submit, as before) ---------- */
+  /* ---------- email capture -> Kit ----------
+     Public form-subscription endpoint (same one Kit's embed uses): no API
+     key or backend needed on a static host. Form IDs live in one place -
+     window.__KIT_FORMS in shell.html (Kit dashboard -> Forms -> embed).
+     While an ID is empty, that form falls back to a pre-composed email so
+     a submission is never silently dropped. ---------- */
+  const kitForms=()=>window.__KIT_FORMS||{contact:'',waitlist:''};
+  const kitPost=(id,data)=>{
+    const ctl=new AbortController(); const to=setTimeout(()=>ctl.abort(),12000);
+    return fetch('https://app.kit.com/forms/'+id+'/subscriptions',{method:'POST',body:data,headers:{Accept:'application/json'},mode:'cors',signal:ctl.signal})
+      .finally(()=>clearTimeout(to));
+  };
+  const kitData=(email,name,extra)=>{ const d=new FormData(); d.append('email_address',email); if(name)d.append('first_name',name); Object.keys(extra||{}).forEach(k=>{ if(extra[k])d.append('fields['+k+']',extra[k]); }); return d; };
+  // Kit answers 200 even on failure ({status:"failed",errors:{...}}), so judge the body.
+  const kitOk=async res=>{ if(!res.ok) return false; try{ const j=await res.json(); return !!j && j.status!=='failed' && !j.errors; }catch(_){ return true; } };
+  const mailto=(subject,body)=>'mailto:nwajdee1@gmail.com?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+  function setBusy(btn,on,label){ if(!btn)return; btn.disabled=on; const s=btn.querySelector('span:not(.btn__bg)'); if(!s)return; if(on){ btn.__lbl=s.textContent; s.textContent=label||'Sending…'; } else if(btn.__lbl){ s.textContent=btn.__lbl; btn.__lbl=null; } }
+  function revealNode(node){ node.classList.add('show'); if(hasG&&!reduce) G.fromTo(node,{opacity:0,y:20},{opacity:1,y:0,duration:.7,ease:'power3.out'}); }
+
+  /* ---------- contact form ---------- */
   function bindForm(){
     const form=$('#contactForm'); if(!form||form.__bound) return; form.__bound=true;
+    const err=$('#formErr',form), btn=$('button[type="submit"]',form);
     function validateField(field){
       const input=field.querySelector('input,select,textarea'); if(!input)return true;
       let ok=true; const v=input.value.trim();
@@ -453,17 +473,55 @@
       if(input.type==='email' && v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) ok=false;
       field.classList.toggle('invalid',!ok); return ok;
     }
-    form.addEventListener('submit',e=>{
+    const values=()=>({name:$('#cf-name',form).value.trim(),email:$('#cf-email',form).value.trim(),type:$('#cf-type',form).value,budget:$('#cf-budget',form).value,message:$('#cf-msg',form).value.trim()});
+    const inquiryMail=v=>mailto('Project inquiry · '+(v.type||'website'),'Hi Jordan,\n\nName: '+v.name+'\nEmail: '+v.email+'\nProject type: '+v.type+'\nBudget: '+(v.budget||'not stated')+'\n\n'+v.message);
+    function fail(v,msg){
+      setBusy(btn,false); err.hidden=false; err.textContent='';
+      err.append(document.createTextNode(msg+' '));
+      const a=document.createElement('a'); a.href=inquiryMail(v); a.textContent='Send it by email instead'; err.append(a);
+    }
+    form.addEventListener('submit',async e=>{
       e.preventDefault();
       const fields=$$('.field',form); let allOk=true;
       fields.forEach(f=>{ if(!validateField(f)) allOk=false; });
       if(!allOk){ const first=$('.field.invalid input,.field.invalid select,.field.invalid textarea',form); if(first)first.focus(); return; }
-      // client-side demo submit (no backend wired) - show success state
-      form.style.display='none';
-      const ok=$('#formSuccess'); ok.classList.add('show');
-      if(hasG&&!reduce) G.fromTo(ok,{opacity:0,y:20},{opacity:1,y:0,duration:.7,ease:'power3.out'});
+      const v=values(); err.hidden=true;
+      if(!kitForms().contact){ window.location.href=inquiryMail(v); form.style.display='none'; revealNode($('#formMail')); return; }
+      setBusy(btn,true);
+      try{
+        const extra={project_type:v.type,budget:v.budget,message:v.message};
+        let good=await kitOk(await kitPost(kitForms().contact,kitData(v.email,v.name,extra)));
+        if(!good) good=await kitOk(await kitPost(kitForms().contact,kitData(v.email,v.name)));
+        if(!good) throw new Error('kit failed');
+        form.style.display='none'; revealNode($('#formSuccess'));
+      }catch(_){ fail(v,'Couldn\'t reach the inbox just now.'); }
     });
     form.addEventListener('input',e=>{const f=e.target.closest('.field'); if(f&&f.classList.contains('invalid'))validateField(f);});
+  }
+
+  /* ---------- academy waitlist ---------- */
+  function bindWaitlist(){
+    const form=$('#waitlistForm'); if(!form||form.__bound) return; form.__bound=true;
+    const input=$('#wl-email',form), field=input.closest('.field'), msg=$('#waitlistMsg'), btn=$('button[type="submit"]',form);
+    const valid=()=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value.trim());
+    function say(text,kind,link){
+      msg.hidden=false; msg.className='kit-msg'+(kind?' kit-msg--'+kind:''); msg.textContent='';
+      msg.append(document.createTextNode(text));
+      if(link){ msg.append(document.createTextNode(' ')); const a=document.createElement('a'); a.href=link; a.textContent='Join by email instead'; msg.append(a); }
+    }
+    form.addEventListener('submit',async e=>{
+      e.preventDefault();
+      const ok=valid(); field.classList.toggle('invalid',!ok); if(!ok){ input.focus(); return; }
+      msg.hidden=true;
+      if(!kitForms().waitlist){ window.location.href=form.dataset.fallback; say('Your email app should open with the waitlist request pre-filled - hit send there.',''); return; }
+      setBusy(btn,true);
+      try{
+        if(!await kitOk(await kitPost(kitForms().waitlist,kitData(input.value.trim(),'')))) throw new Error('kit failed');
+        form.style.display='none';
+        say('You\'re on the list. Dates, price and seat count land in your inbox before the public announcement.','ok');
+      }catch(_){ setBusy(btn,false); say('Couldn\'t reach the list just now. Try again in a moment.','err',form.dataset.fallback); }
+    });
+    input.addEventListener('input',()=>{ if(field.classList.contains('invalid')) field.classList.toggle('invalid',!valid()); });
   }
 
   /* ============================================================
@@ -780,7 +838,7 @@
     if(current==='contact') bindForm();
     if(current==='books'||current==='book') initBookScopes(page);
     if(current==='book'){ initBuybar(page); bindAcc($('#bkFaq',page)); }
-    if(current==='academy') bindAcc($('#acadFaq',page));
+    if(current==='academy'){ bindAcc($('#acadFaq',page)); bindWaitlist(); }
     if(current==='blog') bindBlogFilter(page);
     if(current==='project'){
       /* case videos: play in view, pause out of view; click / key toggles */

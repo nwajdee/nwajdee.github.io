@@ -755,6 +755,13 @@ html.no-js .acc__a p{padding-bottom:1.5rem}
 .camp__who ul{display:grid;grid-template-columns:1fr 1fr;gap:0 2rem}
 .camp__cta{display:flex;gap:1rem;margin-top:2.4rem;flex-wrap:wrap;position:relative}
 .camp__note{margin-top:1.4rem;font-size:.64rem;text-transform:uppercase;letter-spacing:.12em;color:var(--faint);position:relative}
+.kit-row{display:flex;gap:1rem;align-items:flex-start;flex-wrap:wrap;flex:1 1 340px}
+.kit-row__field{flex:1 1 220px;margin-bottom:0}
+.kit-msg{margin-top:1.2rem;font-size:.85rem;color:var(--muted);position:relative}
+.kit-msg--ok{color:var(--accent)}
+.kit-msg--err{color:var(--danger)}
+.kit-msg a,.form-err a,.form-success a{color:inherit;text-decoration:underline;text-underline-offset:3px}
+.form-err{color:var(--danger);font-size:.85rem;margin:0 0 1.2rem;position:relative}
 .minibooks{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
 .minibook{display:flex;gap:1.1rem;align-items:center;background:var(--surface);border:1px solid var(--line-soft);border-radius:18px;padding:1rem;transition:border-color .4s,transform .4s var(--ease)}
 .minibook:hover{border-color:var(--bk,var(--accent));transform:translateY(-3px)}
