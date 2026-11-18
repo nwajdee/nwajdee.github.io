@@ -303,7 +303,7 @@ for (const b of BOOKS) {
   b.href = '/resources/books/' + b.id + '/';
   b.pdf = b.price === null ? '/assets/books/attention-hacking.pdf' : null;
   b.wa = 'https://wa.me/2348111417027?text=' + encodeURIComponent('Hi Jordan, I want to order ' + b.title + ' (' + b.priceLabel + '). Please send payment details and the download link.');
-  b.mail = 'mailto:hello@jordannwachukwu.com?subject=' + encodeURIComponent('Order: ' + b.title + ' (' + b.priceLabel + ')');
+  b.mail = 'mailto:nwajdee1@gmail.com?subject=' + encodeURIComponent('Order: ' + b.title + ' (' + b.priceLabel + ')');
 }
 
 export const ACADEMY = {
@@ -342,7 +342,7 @@ export const ACADEMY = {
     { q: 'Is it live or recorded?', a: 'Live online, in a small cohort so audits stay personal. Sessions are recorded for enrolled students.' },
     { q: 'What does it cost?', a: 'Cohort 01 pricing is announced with the schedule to the waitlist. No charge to join the waitlist.' }
   ],
-  waitlist: 'mailto:hello@jordannwachukwu.com?subject=' + encodeURIComponent('Bootcamp waitlist · Advanced Attention Hacking') + '&body=' + encodeURIComponent('Hi Jordan, add me to the Advanced Attention Hacking Bootcamp waitlist.\n\nName:\nWhat I sell / post:\nMy biggest content struggle:')
+  waitlist: 'mailto:nwajdee1@gmail.com?subject=' + encodeURIComponent('Bootcamp waitlist · Advanced Attention Hacking') + '&body=' + encodeURIComponent('Hi Jordan, add me to the Advanced Attention Hacking Bootcamp waitlist.\n\nName:\nWhat I sell / post:\nMy biggest content struggle:')
 };
 
 export const POSTS = [
