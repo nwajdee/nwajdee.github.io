@@ -530,7 +530,7 @@ html[data-theme="light"] [style*="--bk-l"]{--bk:var(--bk-l)!important}
 .nav-drop__caret:hover{opacity:1}
 .nav-drop__caret svg{width:12px;height:12px;transition:transform .35s var(--ease)}
 .nav-drop.open .nav-drop__caret svg{transform:rotate(180deg)}
-.nav-drop__menu{position:absolute;top:calc(100% + 16px);left:50%;transform:translate(-50%,8px);min-width:252px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:.5rem;opacity:0;visibility:hidden;transition:opacity .3s var(--ease-out),transform .3s var(--ease-out),visibility .3s;box-shadow:0 24px 60px rgba(0,0,0,.35);z-index:950}
+.nav-drop__menu{position:absolute;top:calc(100% + 16px);left:50%;transform:translate(-50%,8px);min-width:252px;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:18px;padding:.5rem;opacity:0;visibility:hidden;transition:opacity .3s var(--ease-out),transform .3s var(--ease-out),visibility .3s;box-shadow:0 24px 60px rgba(0,0,0,.35);z-index:950}
 .nav-drop__menu::before{content:"";position:absolute;top:-16px;left:0;right:0;height:16px}
 .nav-drop.open .nav-drop__menu,.nav-drop:focus-within .nav-drop__menu{opacity:1;visibility:visible;transform:translate(-50%,0)}
 @media(hover:hover){.nav-drop:hover .nav-drop__menu{opacity:1;visibility:visible;transform:translate(-50%,0)}}
