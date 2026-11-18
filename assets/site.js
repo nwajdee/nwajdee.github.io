@@ -1,5 +1,5 @@
 /* ============================================================
-   Jordan Nwachukwu — MPA app
+   Jordan Nwachukwu - MPA app
    Every route is a real HTML document. Internal links are
    intercepted and swapped behind the signature panel curtain
    (fetch + DOMParser + pushState); deep links, refresh, back and
@@ -188,7 +188,7 @@
   })();
 
   /* ============================================================
-     WORK PREVIEW (home rows) — global loop, page-scoped bindings
+     WORK PREVIEW (home rows) - global loop, page-scoped bindings
      ============================================================ */
   const preview=$('#workPreview'), previewImg=preview.querySelector('img');
   let pvx=0,pvy=0,ptx=0,pty=0,pvActive=false,pointerSeen=false,pvId=null,pvDirty=false;
@@ -214,7 +214,7 @@
     if(hasG&&!reduce){G.to(preview,{opacity:0,duration:.3,overwrite:true});}else{preview.style.opacity=0;}
     pvActive=false; }
   /* scrolling can move rows out from under a stationary pointer without
-     firing mouseover/mouseleave — re-sync hover state from the real hit-test.
+     firing mouseover/mouseleave - re-sync hover state from the real hit-test.
      the preview belongs to the recent-work rows ONLY: card media keeps the
      cursor "view" label but must never keep the preview alive */
   function syncHoverAfterScroll(){
@@ -298,7 +298,7 @@
   })();
 
   /* ============================================================
-     THEME (dark default / light) — persisted, pre-paint boot in <head>
+     THEME (dark default / light) - persisted, pre-paint boot in <head>
      ============================================================ */
   const themeToggle=$('#themeToggle'), themeMeta=$('meta[name="theme-color"]');
   let themeTimer=null;
@@ -324,7 +324,7 @@
   applyTheme(savedTheme==='light'?'light':'dark',false);
 
   /* ============================================================
-     PAGE LIFECYCLE — motion + interactions for the active document
+     PAGE LIFECYCLE - motion + interactions for the active document
      ============================================================ */
   const curtain=$('#curtain'), panels=$$('.curtain__panel'), cLabel=$('#curtainLabel');
   let revealIO=null;
@@ -357,7 +357,7 @@
     introBig.innerHTML = words.map(w=>'<span class="w">'+w+'</span>').join(' ');
   }
 
-  /* ---------- reveals (IntersectionObserver — robust without GSAP) ---------- */
+  /* ---------- reveals (IntersectionObserver - robust without GSAP) ---------- */
   function initReveals(page){
     const els=$$('[data-reveal]',page);
     if(!reduce && 'IntersectionObserver' in window){
@@ -458,7 +458,7 @@
       const fields=$$('.field',form); let allOk=true;
       fields.forEach(f=>{ if(!validateField(f)) allOk=false; });
       if(!allOk){ const first=$('.field.invalid input,.field.invalid select,.field.invalid textarea',form); if(first)first.focus(); return; }
-      // client-side demo submit (no backend wired) — show success state
+      // client-side demo submit (no backend wired) - show success state
       form.style.display='none';
       const ok=$('#formSuccess'); ok.classList.add('show');
       if(hasG&&!reduce) G.fromTo(ok,{opacity:0,y:20},{opacity:1,y:0,duration:.7,ease:'power3.out'});
@@ -467,7 +467,7 @@
   }
 
   /* ============================================================
-     3D BOOK VIEWER — three.js lazy module, one damped rAF per
+     3D BOOK VIEWER - three.js lazy module, one damped rAF per
      scene, IO pause offscreen, pixel-ratio cap, full dispose.
      ============================================================ */
   let threeP=null;
@@ -778,7 +778,7 @@
   }
 
   /* ============================================================
-     SWAP NAVIGATION — fetch real documents, swap behind the curtain
+     SWAP NAVIGATION - fetch real documents, swap behind the curtain
      ============================================================ */
   const cache=new Map(), inflight=new Map();
   function fetchDoc(url){
@@ -910,7 +910,7 @@
   });
 
   /* ============================================================
-     PRELOADER — once per session (sessionStorage), hero entrance after
+     PRELOADER - once per session (sessionStorage), hero entrance after
      ============================================================ */
   const preloader=$('#preloader'), preWord=$('#preWord'), preCount=$('#preCount'), preBar=$('#preBar');
   const greetings=['Hello','Bonjour','स्वागत हे','Ciao','Olá','おい','Hallå','Guten tag','Hallo'];
@@ -946,7 +946,7 @@
   }
 
   /* ============================================================
-     FAILSAFE — never leave the user stuck
+     FAILSAFE - never leave the user stuck
      ============================================================ */
   setTimeout(()=>{
     if(preloader && !preloader.classList.contains('done')){ preloader.style.display='none'; preloader.classList.add('done'); }

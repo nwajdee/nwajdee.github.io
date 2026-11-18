@@ -86,7 +86,7 @@ body::after{
 }
 @keyframes grain{0%,100%{transform:translate(0,0)}10%{transform:translate(-5%,-5%)}30%{transform:translate(3%,-8%)}50%{transform:translate(-8%,3%)}70%{transform:translate(6%,6%)}90%{transform:translate(-3%,5%)}}
 
-/* scrollbar — own visual language */
+/* scrollbar - own visual language */
 ::-webkit-scrollbar{width:10px}
 ::-webkit-scrollbar-track{background:var(--bg-3)}
 ::-webkit-scrollbar-thumb{background:var(--surface-2);border-radius:20px;border:2px solid var(--bg-3)}
@@ -300,7 +300,7 @@ section{position:relative}
 @media(hover:none){.work-preview{display:none}}
 
 /* ============================================================
-   WORK PAGE — sticky stacking cards
+   WORK PAGE - sticky stacking cards
    ============================================================ */
 .work-head{padding-block:calc(var(--header-h) + clamp(3rem,8vw,6rem)) clamp(2rem,5vw,4rem)}
 .work-head__title{font-size:var(--fs-display);font-weight:600;letter-spacing:-.03em}
@@ -508,7 +508,7 @@ html.no-js .intro__big .w{opacity:1}
    ============================================================ */
 /* session-gated preloader: hidden pre-paint on repeat loads */
 html.preloaded .preloader{display:none}
-/* 404 — the site's own language */
+/* 404 - the site's own language */
 .notfound{min-height:calc(100svh - var(--header-h));display:flex;flex-direction:column;justify-content:center;padding:calc(var(--header-h) + 3rem) 0 6rem}
 .notfound__code{font-size:clamp(6rem,18vw,14rem);font-weight:800;letter-spacing:-.04em;line-height:.9;color:var(--text);margin-top:1rem}
 .notfound__code .accent{color:var(--accent)}
@@ -516,7 +516,7 @@ html.preloaded .preloader{display:none}
 .notfound__cta{display:flex;gap:1rem;margin-top:2.6rem;flex-wrap:wrap}
 
 /* ============================================================
-   RESOURCES — hub, books, academy, blog, book landings, posts
+   RESOURCES - hub, books, academy, blog, book landings, posts
    Chrome stays on site tokens; each book carries --bk / --bk-l.
    ============================================================ */
 :root{--bk-on:#141517}
@@ -765,7 +765,7 @@ html.no-js .acc__a p{padding-bottom:1.5rem}
 .camp__weeks{display:grid;grid-template-columns:1fr 1fr;gap:clamp(1.5rem,3vw,2.5rem);margin-top:2.4rem;position:relative}
 .camp__week h3,.camp__who h3{font-size:.72rem;text-transform:uppercase;letter-spacing:.16em;color:var(--accent);margin-bottom:1rem;font-weight:500}
 .camp__week li,.camp__who li{display:flex;gap:.8rem;padding:.6rem 0;border-bottom:1px solid var(--line-soft);color:var(--muted);font-size:.95rem;line-height:1.5}
-.camp__week li::before,.camp__who li::before{content:"—";color:var(--faint);flex-shrink:0}
+.camp__week li::before,.camp__who li::before{content:"-";color:var(--faint);flex-shrink:0}
 .camp__who{margin-top:2.4rem;position:relative}
 .camp__who ul{display:grid;grid-template-columns:1fr 1fr;gap:0 2rem}
 .camp__cta{display:flex;gap:1rem;margin-top:2.4rem;flex-wrap:wrap;position:relative}

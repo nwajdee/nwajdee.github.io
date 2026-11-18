@@ -1,5 +1,5 @@
 /* ============================================================
-   build.mjs — zero-dependency static generator
+   build.mjs - zero-dependency static generator
    Emits real HTML documents for every route so clean URLs work
    natively on GitHub Pages (directory index files, real 200s):
      /            → index.html
@@ -171,7 +171,7 @@ function fillBook(tpl, b) {
     '<div class="bl-copy" id="bkHeroCopy">' +
       '<div class="sec-label micro" data-reveal>' + esc(b.eyebrow) + '</div>' +
       '<h1 class="bl-title" data-reveal>' + esc(b.hook) + '</h1>' +
-      '<p class="bl-book mono" data-reveal>' + esc(b.title) + ' — ' + esc(b.subtitle) + '</p>' +
+      '<p class="bl-book mono" data-reveal>' + esc(b.title) + ' - ' + esc(b.subtitle) + '</p>' +
       '<p class="bl-lede" data-reveal>' + esc(b.lede) + '</p>' +
       '<div class="bl-cta" data-reveal>' + primaryCta(b) + btn('#offer', 'See the offer', false) + '</div>' +
       '<div class="bl-facts mono" data-reveal><span>' + esc(b.format) + '</span><span>' + esc(b.priceLabel) + '</span><span>by Jordan Nwachukwu</span></div>' +
@@ -392,5 +392,5 @@ emitted.push('sitemap.xml', 'robots.txt');
 /* ---------- retire the parked SPA fallback (obsolete: real files now) ---------- */
 if (existsSync(join(ROOT, '_redirects'))) { unlinkSync(join(ROOT, '_redirects')); console.log('removed _redirects (SPA fallback no longer needed)'); }
 
-console.log('BUILD OK — ' + emitted.length + ' files');
+console.log('BUILD OK - ' + emitted.length + ' files');
 emitted.forEach(f => console.log('  ' + f));

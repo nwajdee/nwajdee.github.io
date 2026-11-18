@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>AI Video Studio — Prompt to timeline</title>
+<title>AI Video Studio - Prompt to timeline</title>
 <meta name="description" content="An AI video studio that turns a brief into edited, on-brand video. Prompt-to-timeline generation." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -176,17 +176,17 @@ footer .wrap{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
   <div class="wrap hero">
     <span class="eyebrow micro"><span class="dot"></span> Prompt → timeline · v0.9 beta</span>
     <h1>Type the brief.<br /><span class="grad">Get the cut.</span></h1>
-    <p class="sub">An AI video studio that turns a written brief into an edited, on-brand video — scene plan, clips, titles and mix laid onto a timeline you can still steer.</p>
+    <p class="sub">An AI video studio that turns a written brief into an edited, on-brand video - scene plan, clips, titles and mix laid onto a timeline you can still steer.</p>
     <div class="console" data-rv>
-      <div class="console__bar"><span class="lights"><i></i><i></i><i></i></span><span class="title">STUDIO / SESSION 014 — BRAND CUT</span></div>
+      <div class="console__bar"><span class="lights"><i></i><i></i><i></i></span><span class="title">STUDIO / SESSION 014 - BRAND CUT</span></div>
       <div class="console__body">
         <div class="promptpane">
           <label class="micro" for="brief">Brief</label>
           <div class="promptrow">
-            <input id="brief" value="15s launch cut for a coconut snack brand — punchy, tropical, end on pack shot" />
+            <input id="brief" value="15s launch cut for a coconut snack brand - punchy, tropical, end on pack shot" />
             <button class="btn btn--solid" id="gen">Generate</button>
           </div>
-          <div class="statusline" id="status">idle — awaiting brief</div>
+          <div class="statusline" id="status">idle - awaiting brief</div>
           <div class="timeline" id="tl">
             <div class="tl-ruler"><span>00:00</span><span>00:04</span><span>00:08</span><span>00:12</span><span>00:15</span></div>
             <div class="track" id="trV"><span class="tag">V1</span></div>
@@ -214,7 +214,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
   <section id="pipeline"><div class="wrap">
     <div class="sec-head" data-rv><h2>One brief, three passes.</h2><span class="micro">the pipeline</span></div>
     <div class="steps">
-      <div class="step" data-rv><span class="n">PASS 01</span><h3>Read the brief</h3><p>Pull audience, tone, length and brand constraints out of plain language — no forms, no node graphs.</p></div>
+      <div class="step" data-rv><span class="n">PASS 01</span><h3>Read the brief</h3><p>Pull audience, tone, length and brand constraints out of plain language - no forms, no node graphs.</p></div>
       <div class="step" data-rv><span class="n">PASS 02</span><h3>Plan the cut</h3><p>Scene-by-scene plan with timings, title cards and music direction before a single clip is placed.</p></div>
       <div class="step" data-rv><span class="n">PASS 03</span><h3>Lay the timeline</h3><p>Clips, transitions, captions and mix land on editable tracks. Steer anything; re-render only what changed.</p></div>
     </div>
@@ -288,7 +288,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
 </main>
 
 <footer><div class="wrap">
-  <span class="micro">AI Video Studio — a Jordan Nwachukwu product</span>
+  <span class="micro">AI Video Studio - a Jordan Nwachukwu product</span>
   <span class="micro">prompt → timeline · built solo</span>
 </div></footer>
 
@@ -323,7 +323,7 @@ function generate() {
     const a = document.createElement('div'); a.className = 'clip a'; a.style.flex = 1; a.textContent = 'BED · 108 BPM'; $('#trA').appendChild(a);
     [22, 30, 26, 22].forEach((f, i) => { const c = document.createElement('div'); c.className = 'clip t'; c.style.flex = f; c.style.animationDelay = (.5 + i * .08) + 's'; c.textContent = ['HOOK', 'BENEFIT', 'PROOF', 'CTA'][i]; $('#trT').appendChild(c); });
     $('#kScenes').textContent = names.length;
-    setTimeout(() => { st.className = 'statusline'; st.textContent = 'cut laid — 6 scenes · 00:15 · ready to steer'; runPlayhead(); }, reduce ? 0 : 900);
+    setTimeout(() => { st.className = 'statusline'; st.textContent = 'cut laid - 6 scenes · 00:15 · ready to steer'; runPlayhead(); }, reduce ? 0 : 900);
   }, reduce ? 0 : 700);
 }
 function runPlayhead() {
@@ -379,7 +379,7 @@ $('#accessForm').addEventListener('submit', e => {
   const v = $('#accessEmail').value.trim();
   const ok = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
   $('#accessErr').textContent = ok ? '' : 'Add a valid email to join the queue.';
-  $('#accessOk').textContent = ok ? 'Queued — invite lands when your slot opens.' : '';
+  $('#accessOk').textContent = ok ? 'Queued - invite lands when your slot opens.' : '';
   if (ok) $('#accessEmail').value = '';
 });
 generate();

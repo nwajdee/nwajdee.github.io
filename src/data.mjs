@@ -1,5 +1,5 @@
 /* ============================================================
-   DATA — Jordan's real work. Metrics stay bracketed.
+   DATA - Jordan's real work. Metrics stay bracketed.
    Single source of truth for the static generator (build.mjs).
    ============================================================ */
 export const SITE = {
@@ -79,7 +79,7 @@ for (const id of ['ai-studio', 'saas', 'study-abroad']) {
 }
 
 /* ============================================================
-   RESOURCES — books, academy, blog.
+   RESOURCES - books, academy, blog.
    Copy sourced from the ebooks + launch kits (Oct 2026).
    Honesty rules from the kits are load-bearing: no fake
    testimonials, no admission/scholarship/visa promises,
