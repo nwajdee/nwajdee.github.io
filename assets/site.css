@@ -241,7 +241,7 @@ section{position:relative}
 .hero__role p{margin:0;font-size:clamp(1.2rem,2.2vw,2rem);line-height:1.25;font-weight:500}
 @media(max-width:760px){
   .hero{min-height:75svh}
-  .hero__name{font-size:14vw;top:50%;bottom:auto;transform:translateY(-50%)}
+  .hero__name{font-size:28vw;top:50%;bottom:auto;transform:translateY(-50%)}
   /* black pill collapses to just the spinning globe on the right */
   .hero__pill{top:auto;bottom:clamp(4.5rem,12vw,7rem);left:auto;right:var(--pad);gap:0;padding:0;background:transparent;height:auto;min-width:0;font-size:.8rem}
   .hero__pill-text{display:none}
