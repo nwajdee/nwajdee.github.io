@@ -196,6 +196,9 @@ section{position:relative}
 .crumbs__list li:not(:last-child)::after{content:"/";opacity:.55}
 .crumbs__list a{color:var(--muted);transition:color .3s var(--ease)}
 .crumbs__list a:hover{color:var(--text);text-decoration:underline;text-underline-offset:4px}
+.crumbs__home{display:flex;align-items:center}
+.crumbs__home svg{width:1.4em;height:1.4em;display:block;flex:none}
+.crumbs__list a.crumbs__home:hover{text-decoration:none}
 .crumbs__list [aria-current="page"]{color:var(--text)}
 .bl-hero>.crumbs{grid-column:1/-1;margin-bottom:0}
 

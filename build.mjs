@@ -248,10 +248,11 @@ function fillPost(tpl, p) {
 
 /* ---------- breadcrumbs (every page except home) ---------- */
 const CRUMB_LABELS = { work: 'Work', about: 'About', contact: 'Contact', resources: 'Resources', books: 'Books', academy: 'Academy', blog: 'Blog' };
+const HOME_CRUMB = '<a class="crumbs__home" href="/" aria-label="Home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 9.2V21h14V9.2"/><path d="M10 21v-6h4v6"/></svg></a>';
 function renderCrumbs(def) {
   if (def.partial === 'home') return '';
   const segs = def.path.split('/').filter(Boolean);
-  const items = [{ href: '/', label: 'Home' }];
+  const items = [{ href: '/', label: 'Home', home: true }];
   let acc = '/';
   segs.forEach((s, i) => {
     acc += s + '/';
@@ -262,7 +263,7 @@ function renderCrumbs(def) {
     items.push({ href: last ? '' : acc, label });
   });
   return '<nav class="crumbs" aria-label="Breadcrumb"><ol class="crumbs__list mono">' +
-    items.map(it => '<li>' + (it.href ? '<a href="' + it.href + '">' + esc(it.label) + '</a>' : '<span aria-current="page">' + esc(it.label) + '</span>') + '</li>').join('') +
+    items.map(it => '<li>' + (it.home ? HOME_CRUMB : it.href ? '<a href="' + it.href + '">' + esc(it.label) + '</a>' : '<span aria-current="page">' + esc(it.label) + '</span>') + '</li>').join('') +
     '</ol></nav>';
 }
 
