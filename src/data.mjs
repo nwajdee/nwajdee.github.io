@@ -230,7 +230,7 @@ export const BOOKS = [
     eyebrow: '2027 intake edition · checked 6-8 Oct 2026',
     price: 15000, priceLabel: '₦15,000', format: 'PDF + fill-in templates',
     accent: ['#4CC38A', '#0B3D2E'], brand: '#0B3D2E',
-    hook: 'Dem go pay you to school abroad.',
+    hook: 'Get paid to relocate & study abroad',
     lede: 'Most Nigerians believe studying abroad means selling land or paying an agent ₦500,000 to "process" what you could do yourself. The best routes work the other way round: tuition covered, a monthly stipend, sometimes a flight - and in Europe, a PhD that is a salaried job.',
     subhead: '43 fully funded routes ranked for Nigerians, with visa workflows, real naira budgets, scam checks and a deadline calendar to September 2027. No agent. No guarantees - just the real rules.',
     learn: [
