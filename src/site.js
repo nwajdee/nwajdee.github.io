@@ -469,6 +469,9 @@
   /* ============================================================
      3D BOOK VIEWER - three.js lazy module, one damped rAF per
      scene, IO pause offscreen, pixel-ratio cap, full dispose.
+     Composite hardcover: cover boards + inset page block + rounded
+     spine, paper grain bump/roughness, matte varnish, softbox env.
+     Drag to orbit only; slow auto-spin and float unless reduced.
      ============================================================ */
   let threeP=null;
   function loadThree(){ if(!threeP) threeP=import('/assets/vendor/three.module.min.js'); return threeP; }
@@ -476,43 +479,100 @@
 
   function BookScene(el,meta,mode){
     const hero=mode==='hero';
-    const defs={dist:hero?3.7:4.3,spin:!reduce,speed:hero?1:.6,float:reduce?0:(hero?.07:.05),light:1.15,angle:35};
-    let cover='a', spin=defs.spin, speed=defs.speed, floatAmp=defs.float, lightI=defs.light, angle=defs.angle;
-    const target={ry:.5,rx:-.06,dist:defs.dist}, cur={ry:.5,rx:-.06,dist:defs.dist};
-    let dragging=false, dirty=true, ready=false, dead=false, inView=true, raf=0;
-    let THREE,renderer,scene,camera,mesh,key,amb,ro,io,canvas,geoShared;
+    const dist=hero?3.55:3.95;
+    const target={ry:.55,rx:-.06}, cur={ry:.55,rx:-.06};
+    let dragging=false, dirty=true, ready=false, dead=false, inView=true, raf=0, vel=0, lastT=0;
+    let THREE,renderer,scene,camera,book,ro,io,canvas,envRT;
     const texCache={}, mats=[];
-    let frontMat,backMat;
+    const W=1.42,H=2.12,PD=.15,BT=.024,SR=(PD+BT*2)/2,WB=W-SR;
 
-    function spineTexture(){
-      const c=document.createElement('canvas'); c.width=128; c.height=1024;
-      const x=c.getContext('2d');
-      x.fillStyle=meta.c[0]; x.fillRect(0,0,128,1024);
-      x.fillStyle='#141517';
-      x.save(); x.translate(64,512); x.rotate(Math.PI/2);
-      x.font='700 46px "Hanken Grotesk",sans-serif'; x.textAlign='center'; x.textBaseline='middle';
-      x.fillText(meta.t.toUpperCase(),0,0,900);
-      x.restore();
-      x.beginPath(); x.arc(64,60,10,0,7); x.fill();
-      const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; return t;
+    function grain(){
+      if(BookScene.grain) return BookScene.grain;
+      const c=document.createElement('canvas'); c.width=c.height=256;
+      const x=c.getContext('2d'), id=x.createImageData(256,256);
+      for(let i=0;i<id.data.length;i+=4){ const v=110+(Math.random()*36|0); id.data[i]=id.data[i+1]=id.data[i+2]=v; id.data[i+3]=255; }
+      x.putImageData(id,0,0); BookScene.grain=c; return c;
     }
-    function pagesTexture(){
-      const c=document.createElement('canvas'); c.width=256; c.height=256;
-      const x=c.getContext('2d');
-      x.fillStyle='#F2EEE4'; x.fillRect(0,0,256,256);
-      x.fillStyle='rgba(0,0,0,.09)';
-      for(let y=0;y<256;y+=3) x.fillRect(0,y,256,1);
-      const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; return t;
+    function weave(x,w,h){
+      x.globalAlpha=.05; x.fillStyle='#fff';
+      for(let y=0;y<h;y+=3) x.fillRect(0,y,w,1);
+      x.globalAlpha=.04; x.fillStyle='#000';
+      for(let xx=0;xx<w;xx+=3) x.fillRect(xx,0,1,h);
+      x.globalAlpha=1;
     }
-    function coverTex(url){
+    function paperOverlay(x,w,h,hingeSide){
+      weave(x,w,h);
+      x.globalAlpha=.08; x.globalCompositeOperation='overlay';
+      x.fillStyle=x.createPattern(grain(),'repeat'); x.fillRect(0,0,w,h);
+      x.globalCompositeOperation='source-over'; x.globalAlpha=1;
+      const x0=hingeSide==='left'?0:w*.94;
+      const g=x.createLinearGradient(x0,0,x0+w*.06,0);
+      g.addColorStop(0,'rgba(0,0,0,.30)'); g.addColorStop(.55,'rgba(0,0,0,.10)'); g.addColorStop(1,'rgba(0,0,0,0)');
+      x.fillStyle=g; x.fillRect(x0,0,w*.06,h);
+      x.fillStyle='rgba(255,255,255,.05)';
+      x.fillRect(0,0,w,3); x.fillRect(0,h-3,w,3); x.fillRect(0,0,3,h); x.fillRect(w-3,0,3,h);
+    }
+    function noiseTex(w,h,base,alpha){
+      const c=document.createElement('canvas'); c.width=w; c.height=h;
+      const x=c.getContext('2d'); x.fillStyle=base; x.fillRect(0,0,w,h);
+      weave(x,w,h);
+      x.globalAlpha=alpha; x.fillStyle=x.createPattern(grain(),'repeat'); x.fillRect(0,0,w,h); x.globalAlpha=1;
+      return new THREE.CanvasTexture(c);
+    }
+    function coverTex(url,hingeSide){
       if(texCache[url]) return texCache[url];
-      const t=new THREE.TextureLoader().load(url,()=>{dirty=true;});
-      t.colorSpace=THREE.SRGBColorSpace;
+      const c=document.createElement('canvas'); c.width=1024; c.height=1536;
+      const x=c.getContext('2d'); x.fillStyle='#8a8a8a'; x.fillRect(0,0,1024,1536);
+      const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace;
       t.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());
+      const img=new Image();
+      img.onload=()=>{ if(dead)return;
+        const s=Math.max(1024/img.width,1536/img.height), dw=img.width*s, dh=img.height*s;
+        x.drawImage(img,(1024-dw)/2,(1536-dh)/2,dw,dh);
+        paperOverlay(x,1024,1536,hingeSide); t.needsUpdate=true; dirty=true; };
+      img.src=url;
       texCache[url]=t; return t;
     }
-    function applyCover(){ if(!ready)return; frontMat.map=coverTex(meta[cover][0]); backMat.map=coverTex(meta[cover][1]); frontMat.needsUpdate=true; backMat.needsUpdate=true; dirty=true; }
-    function applyLight(){ if(!ready)return; const r=angle*Math.PI/180; key.position.set(Math.sin(r)*3.2,2.1,Math.cos(r)*3.2); key.intensity=1.15*lightI; amb.intensity=.5*lightI; dirty=true; }
+    function spineTexture(){
+      const c=document.createElement('canvas'); c.width=256; c.height=2048;
+      const x=c.getContext('2d');
+      x.fillStyle=meta.c[0]; x.fillRect(0,0,256,2048);
+      paperOverlay(x,256,2048,'left');
+      x.fillStyle='#141517';
+      x.save(); x.translate(128,1024); x.rotate(Math.PI/2);
+      x.font='700 92px "Hanken Grotesk",sans-serif'; x.textAlign='center'; x.textBaseline='middle';
+      x.fillText(meta.t.toUpperCase(),0,0,1500);
+      x.restore();
+      x.save(); x.translate(128,1880); x.rotate(Math.PI/2);
+      x.font='500 44px "Hanken Grotesk",sans-serif'; x.textAlign='center'; x.textBaseline='middle';
+      x.fillText('JORDAN NWACHUKWU',0,0,240);
+      x.restore();
+      x.beginPath(); x.arc(128,140,22,0,7); x.fill();
+      const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace;
+      t.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());
+      return t;
+    }
+    function pagesTexture(dir){
+      const c=document.createElement('canvas'); c.width=c.height=512;
+      const x=c.getContext('2d');
+      x.fillStyle='#F2EDE1'; x.fillRect(0,0,512,512);
+      const line=(p,w,col)=>{ x.fillStyle=col; if(dir==='top') x.fillRect(0,p,512,w); else x.fillRect(p,0,w,512); };
+      for(let i=0;i<512;i+=2) line(i,1,'rgba(70,58,40,'+(0.05+Math.random()*0.09).toFixed(3)+')');
+      let p=10;
+      while(p<500){
+        line(p,2+Math.floor(Math.random()*2),'rgba(96,82,60,'+(0.20+Math.random()*0.14).toFixed(3)+')');
+        line(p+3,1,'rgba(255,252,240,'+(0.10+Math.random()*0.10).toFixed(3)+')');
+        p+=26+Math.floor(Math.random()*22);
+      }
+      const g=dir==='top'?x.createLinearGradient(0,0,0,512):x.createLinearGradient(0,0,512,0);
+      g.addColorStop(0,'rgba(60,48,32,.22)'); g.addColorStop(.09,'rgba(60,48,32,0)');
+      g.addColorStop(.91,'rgba(60,48,32,0)'); g.addColorStop(1,'rgba(60,48,32,.22)');
+      x.fillStyle=g; x.fillRect(0,0,512,512);
+      x.globalAlpha=.06; x.fillStyle=x.createPattern(grain(),'repeat'); x.fillRect(0,0,512,512); x.globalAlpha=1;
+      const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace;
+      t.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());
+      return t;
+    }
 
     function init(T){
       if(dead) return;
@@ -520,49 +580,82 @@
       renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
       renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.75));
       renderer.setSize(el.clientWidth||300,el.clientHeight||300,false);
+      renderer.setClearAlpha(0);
       renderer.outputColorSpace=THREE.SRGBColorSpace;
       renderer.toneMapping=THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure=1.06;
+      renderer.toneMappingExposure=1.12;
       canvas=renderer.domElement;
-      canvas.setAttribute('aria-label',meta.t+' - interactive 3D book. Drag to orbit, scroll to zoom.');
+      canvas.setAttribute('aria-label',meta.t+' - 3D book. Drag to orbit.');
       canvas.setAttribute('role','img');
       el.appendChild(canvas);
       scene=new THREE.Scene();
       camera=new THREE.PerspectiveCamera(38,(el.clientWidth||300)/(el.clientHeight||300),.1,50);
-      camera.position.set(0,.12,cur.dist);
-      amb=new THREE.AmbientLight(0xffffff,.5*lightI);
-      key=new THREE.DirectionalLight(0xffffff,1.15*lightI);
-      const rim=new THREE.DirectionalLight(0xbfd4ff,.55); rim.position.set(-2.5,1.5,-3);
-      const fill=new THREE.DirectionalLight(0xfff2e0,.3); fill.position.set(-3,-.5,2);
-      scene.add(amb,key,rim,fill);
-      if(!BookScene.geo) BookScene.geo=new THREE.BoxGeometry(1.4,2.1,.18);
-      geoShared=BookScene.geo;
-      const spine=spineTexture(), pages=pagesTexture();
-      texCache.__spine=spine; texCache.__pages=pages;
-      const edgeMat=new THREE.MeshStandardMaterial({map:pages,roughness:.9});
-      const spineMat=new THREE.MeshStandardMaterial({map:spine,roughness:.6});
-      frontMat=new THREE.MeshStandardMaterial({roughness:.5,metalness:.02});
-      backMat=new THREE.MeshStandardMaterial({roughness:.5,metalness:.02});
-      mats.push(edgeMat,spineMat,frontMat,backMat);
-      mesh=new THREE.Mesh(geoShared,[edgeMat,spineMat,edgeMat,edgeMat,frontMat,backMat]);
-      scene.add(mesh);
-      ready=true;
-      applyCover(); applyLight();
-      /* prefetch the other cover variation once the first frame is up */
-      setTimeout(()=>{ if(!dead){ coverTex(meta[cover==='a'?'b':'a'][0]); coverTex(meta[cover==='a'?'b':'a'][1]); } },600);
+      camera.position.set(0,0,dist);
 
+      const pm=new THREE.PMREMGenerator(renderer);
+      const es=new THREE.Scene();
+      const softbox=(w,h,col,pos,rot)=>{ const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({color:col})); m.position.set(pos[0],pos[1],pos[2]); m.rotation.set(rot[0],rot[1],rot[2]); es.add(m); };
+      softbox(7,4,new THREE.Color(2.4,1.9,1.4),[0,4.5,0],[Math.PI/2,0,0]);
+      softbox(5,3,new THREE.Color(.24,.31,.62),[-5,1,0],[0,Math.PI/2,0]);
+      softbox(6,4,new THREE.Color(1.15,1.15,1.2),[0,1,5],[0,Math.PI,0]);
+      softbox(5,2.5,new THREE.Color(meta.c[0]).multiplyScalar(1.5),[0,-4,1.5],[-Math.PI/2,0,0]);
+      envRT=pm.fromScene(es,.05);
+      scene.environment=envRT.texture;
+      es.traverse(o=>{ if(o.geometry)o.geometry.dispose(); if(o.material)o.material.dispose(); });
+      pm.dispose();
+
+      const key=new THREE.DirectionalLight(0xfff0dd,2.0); key.position.set(2.6,3.2,2.2);
+      const rim=new THREE.DirectionalLight(0xbccfe4,.85); rim.position.set(-3,1.6,-2.6);
+      const bounce=new THREE.PointLight(new THREE.Color(meta.c[0]),2.0,9,2); bounce.position.set(-1.5,-1.5,-1.3);
+      const hemi=new THREE.HemisphereLight(0xffffff,0x2a2622,.45);
+      scene.add(key,rim,bounce,hemi);
+
+      if(!BookScene.geo) BookScene.geo={
+        board:new THREE.BoxGeometry(WB,H,BT),
+        pages:new THREE.BoxGeometry(WB-.03,H-.055,PD),
+        spine:new THREE.CylinderGeometry(SR,SR,H,28,1,true,Math.PI/2,Math.PI)
+      };
+      const bump=noiseTex(512,768,'#808080',.5);
+      const rough=noiseTex(512,768,'#9a9a9a',.35);
+      const coverOpts={bumpMap:bump,bumpScale:.0016,roughnessMap:rough,roughness:1,metalness:0,clearcoat:.04,clearcoatRoughness:.85,envMapIntensity:.22};
+      const frontMat=new THREE.MeshPhysicalMaterial(Object.assign({map:coverTex(meta.a[0],'left')},coverOpts));
+      const backMat=new THREE.MeshPhysicalMaterial(Object.assign({map:coverTex(meta.a[1],'right')},coverOpts));
+      const spineMat=new THREE.MeshPhysicalMaterial(Object.assign({map:spineTexture()},coverOpts));
+      const edgeMat=new THREE.MeshStandardMaterial({color:new THREE.Color(meta.c[0]).multiplyScalar(.32),roughness:.9});
+      const endMat=new THREE.MeshStandardMaterial({color:0xEDE6D8,roughness:.9});
+      const pagesTopMat=new THREE.MeshStandardMaterial({map:pagesTexture('top'),roughness:.95,envMapIntensity:.08});
+      const pagesForeMat=new THREE.MeshStandardMaterial({map:pagesTexture('fore'),roughness:.95,envMapIntensity:.08});
+      const pagesSideMat=new THREE.MeshStandardMaterial({color:0xEFE8DA,roughness:.95});
+      mats.push(frontMat,backMat,spineMat,edgeMat,endMat,pagesTopMat,pagesForeMat,pagesSideMat);
+      texCache.__bump=bump; texCache.__rough=rough;
+
+      book=new THREE.Group();
+      const bf=new THREE.Mesh(BookScene.geo.board,[edgeMat,edgeMat,edgeMat,edgeMat,frontMat,endMat]);
+      bf.position.set(SR/2,0,PD/2+BT/2);
+      const bb=new THREE.Mesh(BookScene.geo.board,[edgeMat,edgeMat,edgeMat,edgeMat,endMat,backMat]);
+      bb.position.set(SR/2,0,-(PD/2+BT/2));
+      const pg=new THREE.Mesh(BookScene.geo.pages,[pagesForeMat,pagesSideMat,pagesTopMat,pagesTopMat,pagesSideMat,pagesSideMat]);
+      pg.position.set(SR/2-.004,0,0);
+      const sp=new THREE.Mesh(BookScene.geo.spine,spineMat);
+      sp.rotation.y=Math.PI/2; sp.position.set(-W/2+SR,0,0);
+      book.add(bf,bb,pg,sp);
+      scene.add(book);
+
+      ready=true; dirty=true;
       let lx=0,ly=0;
-      canvas.addEventListener('pointerdown',e=>{ dragging=true; lx=e.clientX; ly=e.clientY; try{canvas.setPointerCapture(e.pointerId);}catch(_){} });
-      canvas.addEventListener('pointermove',e=>{ if(!dragging)return; target.ry+=(e.clientX-lx)*.0075; target.rx=clampN(target.rx+(e.clientY-ly)*.005,-.55,.55); lx=e.clientX; ly=e.clientY; dirty=true; });
+      canvas.addEventListener('pointerdown',e=>{ dragging=true; vel=0; lx=e.clientX; ly=e.clientY; try{canvas.setPointerCapture(e.pointerId);}catch(_){} });
+      canvas.addEventListener('pointermove',e=>{ if(!dragging)return;
+        const dx=e.clientX-lx, dy=e.clientY-ly;
+        target.ry+=dx*.0075; target.rx=clampN(target.rx+dy*.005,-.55,.55);
+        vel=dx*.0075*60; lx=e.clientX; ly=e.clientY; dirty=true; });
       const endDrag=()=>{dragging=false;};
       canvas.addEventListener('pointerup',endDrag);
       canvas.addEventListener('pointercancel',endDrag);
-      canvas.addEventListener('wheel',e=>{ e.preventDefault(); e.stopPropagation(); target.dist=clampN(target.dist+e.deltaY*.0022,2.4,6); dirty=true; },{passive:false});
 
       ro=new ResizeObserver(()=>{ const w=el.clientWidth,h=el.clientHeight; if(!w||!h)return; renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix(); dirty=true; });
       ro.observe(el);
       if('IntersectionObserver' in window){
-        io=new IntersectionObserver(es=>{es.forEach(en=>{inView=en.isIntersecting; if(inView)dirty=true;});},{threshold:.02});
+        io=new IntersectionObserver(es2=>{es2.forEach(en=>{inView=en.isIntersecting; if(inView)dirty=true;});},{threshold:.02});
         io.observe(el);
       }
       el.classList.add('book3d--live');
@@ -572,41 +665,30 @@
       if(dead) return;
       raf=requestAnimationFrame(frame);
       if(!inView||document.hidden) return;
-      const time=t*.001;
-      if(spin&&!dragging) target.ry+=speed*.0045;
+      const time=t*.001, dt=clampN((t-lastT)*.001,0,.05); lastT=t;
+      if(!dragging){
+        if(!reduce) target.ry+=dt*.12;
+        if(Math.abs(vel)>1e-3){ target.ry+=vel*dt; vel*=Math.exp(-4*dt); }
+      }
       cur.ry+=(target.ry-cur.ry)*.085;
       cur.rx+=(target.rx-cur.rx)*.085;
-      cur.dist+=(target.dist-cur.dist)*.1;
-      mesh.rotation.y=cur.ry;
-      mesh.rotation.x=cur.rx+(floatAmp?Math.sin(time*.7)*.02:0);
-      mesh.position.y=floatAmp?Math.sin(time*1.1)*floatAmp:0;
-      camera.position.z=cur.dist;
-      const moving=dragging||spin||floatAmp>0||Math.abs(target.ry-cur.ry)>1e-4||Math.abs(target.rx-cur.rx)>1e-4||Math.abs(target.dist-cur.dist)>1e-3;
+      book.rotation.y=cur.ry;
+      book.rotation.x=cur.rx+(reduce?0:Math.sin(time*.7)*.02);
+      book.rotation.z=reduce?0:Math.sin(time*.6+1.3)*.02;
+      const bob=reduce?0:Math.sin(time*.9)*.055;
+      book.position.y=bob;
+      const moving=dragging||!reduce||Math.abs(target.ry-cur.ry)>1e-4||Math.abs(target.rx-cur.rx)>1e-4;
       if(moving||dirty){ renderer.render(scene,camera); dirty=false; }
     }
-    loadThree().then(init).catch(()=>{
-      el.classList.add('book3d--flat');
-      const ctl=el.parentElement&&(el.parentElement.querySelector('.rail')||el.parentElement.querySelector('.shelf-ctl'));
-      if(ctl){ ctl.style.opacity=.4; ctl.style.pointerEvents='none'; ctl.setAttribute('aria-disabled','true'); }
-    });
+    loadThree().then(init).catch(()=>{ el.classList.add('book3d--flat'); });
 
     return {
-      setCover(v){ cover=v; applyCover(); },
-      setFace(f){ const two=Math.PI*2; target.ry=f==='front'?Math.round(cur.ry/two)*two:Math.round((cur.ry-Math.PI)/two)*two+Math.PI; target.rx=-.06; spin=false; dirty=true; },
-      toggleSpin(){ spin=!spin; dirty=true; return spin; },
-      setSpin(v){ spin=v; dirty=true; },
-      setSpeed(v){ speed=v; },
-      setFloat(v){ floatAmp=v; dirty=true; },
-      setLight(v){ lightI=v; applyLight(); },
-      setAngle(v){ angle=v; applyLight(); },
-      setZoom(v){ target.dist=clampN(v,2.4,6); dirty=true; },
-      reset(){ cover='a'; spin=defs.spin; speed=defs.speed; floatAmp=defs.float; lightI=defs.light; angle=defs.angle; target.ry=.5; target.rx=-.06; target.dist=defs.dist; applyCover(); applyLight(); dirty=true; return this.state(); },
-      state(){ return {cover,spin,speed,float:floatAmp,light:lightI,angle,dist:target.dist}; },
       dispose(){
         dead=true; cancelAnimationFrame(raf);
         if(ro)ro.disconnect(); if(io)io.disconnect();
         Object.keys(texCache).forEach(k=>{ if(texCache[k]&&texCache[k].dispose)texCache[k].dispose(); });
         mats.forEach(m=>m.dispose());
+        if(envRT)envRT.dispose();
         if(renderer){ renderer.dispose(); try{renderer.forceContextLoss();}catch(_){} }
         if(canvas)canvas.remove();
         el.classList.remove('book3d--live');
@@ -614,47 +696,10 @@
     };
   }
 
-  function bindBookControls(el,api,meta,mode){
-    const scope=el.parentElement&&(el.parentElement.querySelector('.rail')||el.parentElement.querySelector('.shelf-ctl'));
-    if(!scope) return;
-    const ac=new AbortController(), sig={signal:ac.signal};
-    const segs=$$('.seg__btn',scope), spinBtn=$('[data-ctl="spin"]',scope),
-          ranges={speed:$('[data-ctl="speed"]',scope),float:$('[data-ctl="float"]',scope),light:$('[data-ctl="light"]',scope),angle:$('[data-ctl="angle"]',scope),zoom:$('[data-ctl="zoom"]',scope)},
-          resetBtn=$('[data-ctl="reset"]',scope), dl=$('[data-ctl="download"]',scope);
-    let face='front';
-    function syncSeg(ctl,val){ segs.forEach(b=>{ if(b.dataset.ctl!==ctl)return; const on=b.dataset.val===val; b.classList.toggle('is-on',on); b.setAttribute('aria-pressed',String(on)); }); }
-    function syncSpin(on){ if(!spinBtn)return; spinBtn.classList.toggle('is-on',on); spinBtn.setAttribute('aria-pressed',String(on)); }
-    function syncDownload(){ if(dl)dl.setAttribute('href',meta[api.state().cover][0]); }
-    segs.forEach(b=>b.addEventListener('click',()=>{
-      const ctl=b.dataset.ctl, val=b.dataset.val;
-      if(ctl==='cover'){ api.setCover(val); syncSeg('cover',val); syncDownload(); }
-      if(ctl==='face'){ face=val; api.setFace(val); syncSeg('face',val); syncSpin(false); }
-    },sig));
-    const flip=$('[data-ctl="face"]:not(.seg__btn)',scope);
-    if(flip) flip.addEventListener('click',()=>{ face=face==='front'?'back':'front'; api.setFace(face); syncSpin(false); },sig);
-    if(spinBtn) spinBtn.addEventListener('click',()=>syncSpin(api.toggleSpin()),sig);
-    Object.keys(ranges).forEach(k=>{ const r=ranges[k]; if(!r)return;
-      r.addEventListener('input',()=>{ const v=parseFloat(r.value);
-        if(k==='speed')api.setSpeed(v); if(k==='float')api.setFloat(v); if(k==='light')api.setLight(v); if(k==='angle')api.setAngle(v); if(k==='zoom')api.setZoom(v);
-      },sig);
-    });
-    if(resetBtn) resetBtn.addEventListener('click',()=>{
-      const s=api.reset(); face='front';
-      syncSeg('cover',s.cover); syncSeg('face','front'); syncSpin(s.spin); syncDownload();
-      if(ranges.speed)ranges.speed.value=s.speed; if(ranges.float)ranges.float.value=s.float;
-      if(ranges.light)ranges.light.value=s.light; if(ranges.angle)ranges.angle.value=s.angle; if(ranges.zoom)ranges.zoom.value=s.dist;
-    },sig);
-    syncDownload();
-    syncSpin(api.state().spin);
-    pageCleanup.push(()=>ac.abort());
-  }
-
   function initBookScopes(page){
     $$('.book3d',page).forEach(el=>{
       const meta=DATA.books&&DATA.books[el.dataset.book]; if(!meta) return;
-      const mode=el.dataset.mode||'shelf';
-      const api=BookScene(el,meta,mode);
-      bindBookControls(el,api,meta,mode);
+      const api=BookScene(el,meta,el.dataset.mode||'shelf');
       pageCleanup.push(()=>api.dispose());
     });
   }

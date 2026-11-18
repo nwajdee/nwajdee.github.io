@@ -102,15 +102,6 @@ function renderShelf() {
     '<article class="shelf-item" data-id="' + b.id + '" style="--bk:' + b.accent[0] + ';--bk-l:' + b.accent[1] + '" data-reveal>' +
       '<div class="shelf-item__stage">' +
         '<div class="book3d" data-book="' + b.id + '" data-mode="shelf"><img class="book3d__fallback" src="' + b.covers.a.front + '" alt="' + esc(b.title) + ' - front cover" /></div>' +
-        '<div class="shelf-ctl" role="group" aria-label="' + esc(b.title) + ' 3D controls">' +
-          '<div class="seg" role="group" aria-label="Cover variation">' +
-            '<button type="button" class="seg__btn is-on" data-ctl="cover" data-val="a" aria-pressed="true">A</button>' +
-            '<button type="button" class="seg__btn" data-ctl="cover" data-val="b" aria-pressed="false">B</button>' +
-          '</div>' +
-          '<button type="button" class="shelf-ctl__btn mono" data-ctl="face" data-val="back">Flip</button>' +
-          '<button type="button" class="shelf-ctl__btn mono is-on" data-ctl="spin" aria-pressed="true">Spin</button>' +
-        '</div>' +
-        '<span class="shelf-ctl__hint mono">drag to orbit · wheel to zoom</span>' +
       '</div>' +
       '<div class="shelf-item__info">' +
         '<div class="shelf-item__top mono"><span>' + String(i + 1).padStart(2, '0') + ' / ' + String(BOOKS.length).padStart(2, '0') + '</span><span class="price-tag">' + esc(b.priceLabel) + '</span></div>' +

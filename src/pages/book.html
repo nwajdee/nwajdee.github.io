@@ -4,35 +4,6 @@
       <div class="book3d book3d--hero" data-book="{{BK_ID}}" data-mode="hero">
         <img class="book3d__fallback" src="{{BK_FRONT}}" alt="{{BK_TITLE}} - front cover" />
       </div>
-      <div class="rail" role="group" aria-label="3D book controls">
-        <div class="rail__row">
-          <span class="rail__lbl mono">Cover</span>
-          <div class="seg" role="group" aria-label="Cover variation">
-            <button type="button" class="seg__btn is-on" data-ctl="cover" data-val="a" aria-pressed="true">A</button>
-            <button type="button" class="seg__btn" data-ctl="cover" data-val="b" aria-pressed="false">B</button>
-          </div>
-          <span class="rail__lbl mono">Face</span>
-          <div class="seg" role="group" aria-label="Book face">
-            <button type="button" class="seg__btn is-on" data-ctl="face" data-val="front" aria-pressed="true">Front</button>
-            <button type="button" class="seg__btn" data-ctl="face" data-val="back" aria-pressed="false">Back</button>
-          </div>
-        </div>
-        <div class="rail__row">
-          <button type="button" class="rail__toggle is-on" data-ctl="spin" aria-pressed="true"><span class="dot" aria-hidden="true"></span>Auto-spin</button>
-          <label class="rail__range mono">Speed<input type="range" data-ctl="speed" min="0.2" max="3" step="0.1" value="1" aria-label="Spin speed"></label>
-          <label class="rail__range mono">Float<input type="range" data-ctl="float" min="0" max="0.2" step="0.01" value="0.07" aria-label="Float amplitude"></label>
-        </div>
-        <div class="rail__row">
-          <label class="rail__range mono">Light<input type="range" data-ctl="light" min="0.2" max="2.4" step="0.05" value="1.15" aria-label="Light intensity"></label>
-          <label class="rail__range mono">Angle<input type="range" data-ctl="angle" min="-180" max="180" step="5" value="35" aria-label="Light direction"></label>
-          <label class="rail__range mono">Zoom<input type="range" data-ctl="zoom" min="2.4" max="6" step="0.1" value="3.7" aria-label="Camera distance"></label>
-        </div>
-        <div class="rail__row">
-          <button type="button" class="rail__btn mono" data-ctl="reset">Reset view</button>
-          <a class="rail__btn mono" data-ctl="download" href="{{BK_FRONT}}" download>Download cover</a>
-          <span class="rail__hint mono">drag to orbit · wheel to zoom</span>
-        </div>
-      </div>
     </div>
     <div class="bl-copy" id="bkHeroCopy"></div>
   </section>
