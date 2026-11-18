@@ -291,7 +291,7 @@
     const drop=$('#navDrop'), caret=$('#navDropCaret'); if(!drop||!caret) return;
     function setOpen(v){ drop.classList.toggle('open',v); caret.setAttribute('aria-expanded',String(v)); }
     caret.addEventListener('click',e=>{ e.stopPropagation(); setOpen(!drop.classList.contains('open')); });
-    drop.addEventListener('click',e=>{ if(e.target.closest('a')) setOpen(false); });
+    drop.addEventListener('click',e=>{ if(e.target.closest('a')){ setOpen(false); /* move focus out of the drop so :focus-within cannot hold the menu open across the page swap */ const m=$('#main'); if(m) m.focus({preventScroll:true}); } });
     document.addEventListener('click',e=>{ if(!drop.contains(e.target)) setOpen(false); });
     document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&drop.classList.contains('open')){ setOpen(false); caret.focus({preventScroll:true}); } });
     drop.addEventListener('focusout',e=>{ if(e.relatedTarget&&!drop.contains(e.relatedTarget)) setOpen(false); });

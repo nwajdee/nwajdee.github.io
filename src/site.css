@@ -68,6 +68,7 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 input,select,textarea{font:inherit;color:inherit}
 ::selection{background:var(--accent);color:var(--on-accent)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+#main:focus{outline:none}
 h1,h2,h3,h4{font-weight:600;line-height:1.02;letter-spacing:-.02em}
 .mono{font-family:var(--mono)}
 .micro{
@@ -547,7 +548,6 @@ html[data-theme="light"] [style*="--bk-l"]{--bk:var(--bk-l)!important}
 .nav-drop__item{display:flex;flex-direction:column;gap:.15rem;padding:.7rem .9rem;border-radius:12px;transition:background .3s}
 .nav-drop__item:hover{background:var(--surface-2)}
 .nav-drop__name{font-weight:600;font-size:.92rem}
-.nav-drop__desc{font-size:.62rem;text-transform:uppercase;letter-spacing:.12em;color:var(--faint)}
 @media(max-width:760px){.nav-drop{display:none}}
 
 /* ---------- overlay menu resources group ---------- */
