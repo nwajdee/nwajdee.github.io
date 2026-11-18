@@ -132,16 +132,18 @@
     $$('[data-magnetic]',scope).forEach(el=>{
       if(el.__mag) return; el.__mag=true;
       const strength=parseFloat(el.dataset.strength||'0.35');
-      const inner=el.querySelector('.btn,.footer__btn,.menu-btn__label')||el.firstElementChild||el;
+      const pick=el.querySelector('.btn,.footer__btn,.menu-btn__label')||el.firstElementChild||el;
+      // never parallax the slide-in fill: an inline transform on it cancels its rest-state hide
+      const inner=pick.classList.contains('btn__bg')?el:pick;
       el.addEventListener('mousemove',e=>{
         const r=el.getBoundingClientRect();
         const x=e.clientX-(r.left+r.width/2), y=e.clientY-(r.top+r.height/2);
         G.to(el,{x:x*strength,y:y*strength,duration:.6,ease:'power3.out'});
-        G.to(inner,{x:x*strength*.4,y:y*strength*.4,duration:.6,ease:'power3.out'});
+        if(inner!==el) G.to(inner,{x:x*strength*.4,y:y*strength*.4,duration:.6,ease:'power3.out'});
       });
       el.addEventListener('mouseleave',()=>{
         G.to(el,{x:0,y:0,duration:.9,ease:'elastic.out(1,0.35)'});
-        G.to(inner,{x:0,y:0,duration:.9,ease:'elastic.out(1,0.35)'});
+        if(inner!==el) G.to(inner,{x:0,y:0,duration:.9,ease:'elastic.out(1,0.35)'});
       });
     });
   }
