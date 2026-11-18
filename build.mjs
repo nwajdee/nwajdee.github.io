@@ -163,7 +163,7 @@ function fillBook(tpl, b) {
       '<h1 class="bl-title" data-reveal>' + esc(b.hook) + '</h1>' +
       '<p class="bl-book mono" data-reveal>' + esc(b.title) + ' - ' + esc(b.subtitle) + '</p>' +
       '<p class="bl-lede" data-reveal>' + esc(b.lede) + '</p>' +
-      '<div class="bl-cta" data-reveal>' + primaryCta(b) + btn('#offer', 'See the offer', false) + '</div>' +
+      '<div class="bl-cta" data-reveal>' + primaryCta(b) + '</div>' +
       '<div class="bl-facts mono" data-reveal><span>' + esc(b.format) + '</span><span>' + esc(b.priceLabel) + '</span><span>by Jordan Nwachukwu</span></div>' +
     '</div>');
 

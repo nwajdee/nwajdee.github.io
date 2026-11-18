@@ -478,13 +478,17 @@
   const clampN=(v,a,b)=>Math.min(b,Math.max(a,v));
 
   function BookScene(el,meta,mode){
-    const hero=mode==='hero';
-    const dist=hero?3.55:3.95;
     const target={ry:.55,rx:-.06}, cur={ry:.55,rx:-.06};
     let dragging=false, dirty=true, ready=false, dead=false, inView=true, raf=0, vel=0, lastT=0;
     let THREE,renderer,scene,camera,book,ro,io,canvas,envRT;
     const texCache={}, mats=[];
     const W=1.42,H=2.12,PD=.15,BT=.024,SR=(PD+BT*2)/2,WB=W-SR;
+    // Fit the book's bounding sphere (+ float bob + margin) inside the frustum:
+    // asin(R/dist) <= the tighter of vertical/horizontal half-fov, so no spin
+    // or drag angle can clip the book at any viewport edge, at any aspect.
+    const FIT_R=Math.hypot(W/2,H/2,(PD+BT*2)/2)+.055+.02;
+    const VHALF=19*Math.PI/180;
+    const fitDist=()=>{ const a=(el.clientWidth||300)/(el.clientHeight||300); return FIT_R/Math.sin(Math.min(VHALF,Math.atan(Math.tan(VHALF)*a))); };
 
     function grain(){
       if(BookScene.grain) return BookScene.grain;
@@ -590,7 +594,7 @@
       el.appendChild(canvas);
       scene=new THREE.Scene();
       camera=new THREE.PerspectiveCamera(38,(el.clientWidth||300)/(el.clientHeight||300),.1,50);
-      camera.position.set(0,0,dist);
+      camera.position.set(0,0,fitDist());
 
       const pm=new THREE.PMREMGenerator(renderer);
       const es=new THREE.Scene();
@@ -652,7 +656,7 @@
       canvas.addEventListener('pointerup',endDrag);
       canvas.addEventListener('pointercancel',endDrag);
 
-      ro=new ResizeObserver(()=>{ const w=el.clientWidth,h=el.clientHeight; if(!w||!h)return; renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix(); dirty=true; });
+      ro=new ResizeObserver(()=>{ const w=el.clientWidth,h=el.clientHeight; if(!w||!h)return; renderer.setSize(w,h,false); camera.aspect=w/h; camera.position.z=fitDist(); camera.updateProjectionMatrix(); dirty=true; });
       ro.observe(el);
       if('IntersectionObserver' in window){
         io=new IntersectionObserver(es2=>{es2.forEach(en=>{inView=en.isIntersecting; if(inView)dirty=true;});},{threshold:.02});

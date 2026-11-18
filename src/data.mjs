@@ -305,6 +305,10 @@ for (const b of BOOKS) {
   b.wa = 'https://wa.me/2348111417027?text=' + encodeURIComponent('Hi Jordan, I want to order ' + b.title + ' (' + b.priceLabel + '). Please send payment details and the download link.');
   b.mail = 'mailto:nwajdee1@gmail.com?subject=' + encodeURIComponent('Order: ' + b.title + ' (' + b.priceLabel + ')');
 }
+// JAPA FREE leads with the alternate stamp cover (the departure-lounge /
+// boarding-pass shoot); the mail-slot cover stays as the alternate front.
+const japa = BOOKS.find(b => b.id === 'japa-free');
+[japa.covers.a.front, japa.covers.b.front] = [japa.covers.b.front, japa.covers.a.front];
 
 export const ACADEMY = {
   name: 'Advanced Attention Hacking Bootcamp',
