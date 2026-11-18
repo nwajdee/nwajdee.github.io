@@ -190,7 +190,6 @@ html.no-js .theme-toggle{display:none}
 .wrap{max-width:1440px;margin:0 auto;padding-left:var(--pad);padding-right:var(--pad)}
 section{position:relative}
 .sec-label{display:flex;align-items:center;gap:.8rem;margin-bottom:2.4rem}
-.sec-label::before{content:"";width:34px;height:1px;background:var(--faint)}
 .crumbs{margin-bottom:1.5rem}
 .crumbs__list{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:.6rem;list-style:none;margin:0;padding:0;font-size:var(--fs-micro);text-transform:uppercase;letter-spacing:.18em;color:var(--faint)}
 .crumbs__list li{display:flex;align-items:center;gap:.6rem;min-width:0}
