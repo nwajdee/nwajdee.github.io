@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI Video Studio — Prompt to timeline</title>
+<meta name="description" content="An AI video studio that turns a brief into edited, on-brand video. Prompt-to-timeline generation." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --bg:#0A0C10; --surface:#12151C; --surface2:#181C26; --line:#232A38; --line-soft:#1A202C;
+  --ink:#E8ECF4; --muted:#9AA6BC; --faint:#5C6880;
+  --cyan:#35E0FF; --violet:#7C5CFF; --magenta:#FF4D8D; --amber:#FFB454; --green:#3DDC97;
+  --disp:'Space Grotesk',sans-serif; --mono:'JetBrains Mono',monospace;
+  --ease:cubic-bezier(.77,0,.175,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--disp);font-size:16px;line-height:1.6;overflow-x:hidden}
+::selection{background:var(--cyan);color:#06282E}
+::-webkit-scrollbar{width:10px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px;border:2px solid var(--bg)}
+::-webkit-scrollbar-thumb:hover{background:var(--violet)}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+.wrap{width:min(1240px,92vw);margin:0 auto}
+.micro{font-family:var(--mono);font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:var(--faint)}
+/* ambient layered background */
+.ambient{position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(900px 500px at 85% -10%, rgba(124,92,255,.16), transparent 60%),
+    radial-gradient(700px 420px at -10% 30%, rgba(53,224,255,.10), transparent 60%),
+    radial-gradient(600px 400px at 60% 110%, rgba(255,77,141,.08), transparent 60%),
+    var(--bg);}
+.ambient::after{content:"";position:absolute;inset:0;opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");}
+.gridlines{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.35;
+  background-image:linear-gradient(var(--line-soft) 1px,transparent 1px),linear-gradient(90deg,var(--line-soft) 1px,transparent 1px);
+  background-size:72px 72px;mask-image:radial-gradient(80% 60% at 50% 20%,#000 30%,transparent 100%);}
+/* nav */
+header{position:fixed;top:0;left:0;right:0;z-index:50;backdrop-filter:blur(14px);background:rgba(10,12,16,.72);border-bottom:1px solid var(--line-soft)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:64px}
+.brand{display:flex;align-items:center;gap:.6rem;font-weight:700;letter-spacing:.02em}
+.brand .glyph{display:inline-flex;gap:2px;align-items:flex-end;height:18px}
+.brand .glyph i{width:4px;background:var(--cyan);border-radius:1px}
+.brand .glyph i:nth-child(1){height:8px}.brand .glyph i:nth-child(2){height:18px;background:var(--violet)}.brand .glyph i:nth-child(3){height:12px;background:var(--magenta)}
+.navlinks{display:flex;gap:1.8rem;align-items:center}
+.navlinks a{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);transition:color .3s}
+.navlinks a:hover{color:var(--cyan)}
+.btn{display:inline-flex;align-items:center;gap:.5rem;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:.6rem 1.1rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;transition:border-color .3s,box-shadow .3s,transform .3s}
+.btn:hover{border-color:var(--cyan);box-shadow:0 0 0 1px var(--cyan),0 8px 30px rgba(53,224,255,.18);transform:translateY(-1px)}
+.btn.btn--solid{background:linear-gradient(120deg,var(--cyan),var(--violet));border:0;color:#041018;font-weight:700}
+.btn.btn--solid:hover{box-shadow:0 10px 36px rgba(124,92,255,.35);color:#041018}
+/* hero */
+.hero{padding:150px 0 40px}
+.hero .eyebrow{display:inline-flex;align-items:center;gap:.6rem;border:1px solid var(--line);border-radius:100px;padding:.4rem .9rem;margin-bottom:1.6rem}
+.hero .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--magenta);box-shadow:0 0 12px var(--magenta);animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.35}}
+h1{font-size:clamp(2.6rem,6vw,4.9rem);line-height:1.02;font-weight:700;letter-spacing:-.02em;max-width:16ch}
+h1 .grad{background:linear-gradient(100deg,var(--cyan) 10%,var(--violet) 55%,var(--magenta) 95%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.sub{color:var(--muted);max-width:56ch;margin:1.4rem 0 2.2rem;font-size:1.05rem}
+/* demo console */
+.console{border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,var(--surface),var(--surface2));overflow:hidden;box-shadow:0 40px 120px rgba(0,0,0,.5)}
+.console__bar{display:flex;align-items:center;gap:.8rem;padding:.7rem 1rem;border-bottom:1px solid var(--line-soft);background:rgba(255,255,255,.02)}
+.console__bar .lights{display:flex;gap:6px}
+.console__bar .lights i{width:10px;height:10px;border-radius:50%}
+.console__bar .lights i:nth-child(1){background:var(--magenta)}.console__bar .lights i:nth-child(2){background:var(--amber)}.console__bar .lights i:nth-child(3){background:var(--green)}
+.console__bar .title{font-family:var(--mono);font-size:.68rem;color:var(--faint);letter-spacing:.14em}
+.console__body{display:grid;grid-template-columns:1.25fr .9fr;gap:0}
+.promptpane{padding:1.4rem;border-right:1px solid var(--line-soft)}
+.promptpane label{display:block;margin-bottom:.6rem}
+.promptrow{display:flex;gap:.6rem}
+.promptrow input{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--ink);padding:.8rem 1rem;font-family:var(--mono);font-size:.8rem;outline:none;transition:border-color .3s,box-shadow .3s}
+.promptrow input:focus{border-color:var(--violet);box-shadow:0 0 0 3px rgba(124,92,255,.2)}
+.statusline{margin-top:.9rem;font-family:var(--mono);font-size:.7rem;color:var(--green);min-height:1.2em}
+.statusline.busy{color:var(--amber)}
+.timeline{margin-top:1.2rem;border:1px solid var(--line-soft);border-radius:12px;background:var(--bg);padding:.9rem;position:relative;overflow:hidden}
+.tl-ruler{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.6rem;color:var(--faint);margin-bottom:.5rem}
+.track{display:flex;gap:4px;height:44px;margin-bottom:6px;align-items:stretch}
+.track .tag{flex:0 0 34px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.6rem;color:var(--faint);border:1px solid var(--line-soft);border-radius:6px}
+.clip{border-radius:6px;position:relative;overflow:hidden;display:flex;align-items:flex-end;padding:4px 6px;font-family:var(--mono);font-size:.58rem;color:#041018;font-weight:700;transform-origin:left center;animation:clipin .5s var(--ease) both}
+@keyframes clipin{from{transform:scaleX(0);opacity:0}}
+.clip.v{background:linear-gradient(120deg,var(--cyan),#1FA8C9)}
+.clip.v2{background:linear-gradient(120deg,var(--violet),#5B3FD4);color:#EDE9FF}
+.clip.a{background:repeating-linear-gradient(90deg,var(--green) 0 3px,#1F8F66 3px 6px);color:#032117}
+.clip.t{background:linear-gradient(120deg,var(--amber),#D98A2B);color:#241303}
+.playhead{position:absolute;top:26px;bottom:8px;width:2px;background:var(--magenta);box-shadow:0 0 10px var(--magenta);left:44px}
+.previewpane{padding:1.4rem;display:flex;flex-direction:column;gap:.9rem}
+.preview{aspect-ratio:16/9;border-radius:12px;border:1px solid var(--line);background:radial-gradient(120% 120% at 20% 10%,#20304A,#0B0E14 70%);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.preview .scene{font-family:var(--mono);font-size:.72rem;color:var(--cyan);letter-spacing:.14em;text-transform:uppercase;text-align:center;padding:0 1rem}
+.preview .rec{position:absolute;top:10px;left:12px;display:flex;gap:6px;align-items:center;font-family:var(--mono);font-size:.6rem;color:var(--magenta)}
+.preview .rec i{width:7px;height:7px;border-radius:50%;background:var(--magenta);animation:pulse 1.2s infinite}
+.preview .tc{position:absolute;bottom:10px;right:12px;font-family:var(--mono);font-size:.62rem;color:var(--muted)}
+.meters{display:flex;gap:6px;align-items:flex-end;height:34px}
+.meters i{flex:1;background:linear-gradient(180deg,var(--cyan),var(--violet));border-radius:2px;animation:eq 1s infinite ease-in-out}
+@keyframes eq{0%,100%{height:22%}50%{height:96%}}
+/* marquee */
+.marquee{border-block:1px solid var(--line-soft);margin:70px 0 0;overflow:hidden;padding:.9rem 0;background:rgba(255,255,255,.015)}
+.marquee__in{display:flex;gap:3rem;white-space:nowrap;width:max-content;animation:mq 26s linear infinite;font-family:var(--mono);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
+.marquee__in span b{color:var(--cyan);font-weight:500}
+@keyframes mq{to{transform:translateX(-50%)}}
+/* sections */
+section{padding:96px 0}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:2rem;margin-bottom:2.6rem}
+h2{font-size:clamp(1.8rem,3.4vw,2.7rem);letter-spacing:-.01em;line-height:1.1}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem}
+.step{border:1px solid var(--line);border-radius:14px;padding:1.6rem;background:var(--surface);position:relative;overflow:hidden;transition:transform .4s var(--ease),border-color .4s}
+.step:hover{transform:translateY(-4px);border-color:var(--violet)}
+.step .n{font-family:var(--mono);font-size:.7rem;color:var(--violet);letter-spacing:.2em}
+.step h3{margin:.7rem 0 .5rem;font-size:1.2rem}
+.step p{color:var(--muted);font-size:.92rem}
+.step::after{content:"";position:absolute;inset:auto -30% -60% auto;width:70%;height:80%;background:radial-gradient(closest-side,rgba(124,92,255,.16),transparent);pointer-events:none}
+/* editor tabs */
+.tabs{display:flex;gap:.5rem;margin-bottom:1rem}
+.tab{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:8px;padding:.45rem .9rem;font-family:var(--mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;transition:all .3s}
+.tab.on{background:var(--cyan);border-color:var(--cyan);color:#06282E;font-weight:700}
+.panel{border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:1.4rem;min-height:220px}
+.panel[hidden]{display:none}
+.kv{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+.kv .cell{border:1px solid var(--line-soft);border-radius:10px;padding:.9rem;background:var(--bg)}
+.kv .cell .k{font-family:var(--mono);font-size:.6rem;color:var(--faint);letter-spacing:.16em;text-transform:uppercase}
+.kv .cell .v{font-size:1.3rem;font-weight:700;margin-top:.3rem}
+.kv .cell .v.cy{color:var(--cyan)}.kv .cell .v.vi{color:var(--violet)}.kv .cell .v.mg{color:var(--magenta)}.kv .cell .v.gr{color:var(--green)}
+.sliders{display:grid;gap:1rem;margin-top:1.2rem}
+.slider{display:grid;grid-template-columns:110px 1fr 48px;align-items:center;gap:1rem;font-family:var(--mono);font-size:.68rem;color:var(--muted)}
+.slider input{accent-color:var(--violet);width:100%}
+.slider output{color:var(--cyan);text-align:right}
+/* renders queue */
+.queue{display:grid;gap:.7rem}
+.qrow{display:grid;grid-template-columns:1fr 120px 110px;gap:1rem;align-items:center;border:1px solid var(--line-soft);border-radius:10px;padding:.8rem 1rem;background:var(--surface)}
+.qrow .name{font-family:var(--mono);font-size:.74rem}
+.qrow .bar{height:6px;border-radius:4px;background:var(--line-soft);overflow:hidden}
+.qrow .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--violet));width:0%;transition:width .4s linear}
+.chip{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;border-radius:100px;padding:.25rem .7rem;text-align:center}
+.chip.run{color:var(--amber);border:1px solid rgba(255,180,84,.4)}
+.chip.done{color:var(--green);border:1px solid rgba(61,220,151,.4)}
+/* access */
+.access{border:1px solid var(--line);border-radius:18px;padding:clamp(1.6rem,4vw,3rem);background:linear-gradient(140deg,rgba(53,224,255,.08),rgba(124,92,255,.10) 50%,rgba(255,77,141,.07));display:grid;grid-template-columns:1.1fr .9fr;gap:2rem;align-items:center}
+.access form{display:flex;gap:.6rem}
+.access input{flex:1;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:.85rem 1rem;color:var(--ink);font-family:var(--mono);font-size:.8rem;outline:none}
+.access input:focus{border-color:var(--cyan)}
+.access .err{color:var(--magenta);font-family:var(--mono);font-size:.68rem;margin-top:.5rem;min-height:1em}
+.access .ok{color:var(--green);font-family:var(--mono);font-size:.72rem;margin-top:.5rem}
+footer{border-top:1px solid var(--line-soft);padding:2rem 0 3rem;margin-top:40px}
+footer .wrap{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+/* reveal */
+[data-rv]{opacity:0;transform:translateY(26px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+[data-rv].in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}[data-rv]{opacity:1;transform:none}}
+@media (max-width:900px){
+  .console__body{grid-template-columns:1fr}
+  .promptpane{border-right:0;border-bottom:1px solid var(--line-soft)}
+  .steps{grid-template-columns:1fr}
+  .kv{grid-template-columns:repeat(2,1fr)}
+  .access{grid-template-columns:1fr}
+  .navlinks a:not(.btn){display:none}
+  .qrow{grid-template-columns:1fr 90px}
+  .qrow .chip{grid-column:2}
+}
+</style>
+</head>
+<body>
+<div class="ambient"></div><div class="gridlines"></div>
+<header><div class="wrap nav">
+  <a class="brand" href="#top"><span class="glyph"><i></i><i></i><i></i></span> AI VIDEO STUDIO</a>
+  <nav class="navlinks">
+    <a href="#pipeline">Pipeline</a><a href="#editor">Editor</a><a href="#renders">Renders</a>
+    <a class="btn btn--solid" href="#access">Request access</a>
+  </nav>
+</div></header>
+
+<main id="top">
+  <div class="wrap hero">
+    <span class="eyebrow micro"><span class="dot"></span> Prompt → timeline · v0.9 beta</span>
+    <h1>Type the brief.<br /><span class="grad">Get the cut.</span></h1>
+    <p class="sub">An AI video studio that turns a written brief into an edited, on-brand video — scene plan, clips, titles and mix laid onto a timeline you can still steer.</p>
+    <div class="console" data-rv>
+      <div class="console__bar"><span class="lights"><i></i><i></i><i></i></span><span class="title">STUDIO / SESSION 014 — BRAND CUT</span></div>
+      <div class="console__body">
+        <div class="promptpane">
+          <label class="micro" for="brief">Brief</label>
+          <div class="promptrow">
+            <input id="brief" value="15s launch cut for a coconut snack brand — punchy, tropical, end on pack shot" />
+            <button class="btn btn--solid" id="gen">Generate</button>
+          </div>
+          <div class="statusline" id="status">idle — awaiting brief</div>
+          <div class="timeline" id="tl">
+            <div class="tl-ruler"><span>00:00</span><span>00:04</span><span>00:08</span><span>00:12</span><span>00:15</span></div>
+            <div class="track" id="trV"><span class="tag">V1</span></div>
+            <div class="track" id="trV2"><span class="tag">V2</span></div>
+            <div class="track" id="trA"><span class="tag">A1</span></div>
+            <div class="track" id="trT"><span class="tag">TXT</span></div>
+            <div class="playhead" id="ph"></div>
+          </div>
+        </div>
+        <div class="previewpane">
+          <span class="micro">Program monitor</span>
+          <div class="preview"><span class="rec"><i></i>PREVIEW</span><span class="scene" id="scene">press generate to lay the cut</span><span class="tc" id="tc">00:00:00</span></div>
+          <div class="meters" id="meters"></div>
+          <span class="micro">mix bus · -14 LUFS target</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="marquee"><div class="marquee__in" id="mq">
+    <span>BRIEF PARSING <b>◆</b> SCENE PLANNING <b>◆</b> CLIP RETRIEVAL <b>◆</b> AUTO TITLES <b>◆</b> BEAT-SYNCED CUTS <b>◆</b> BRAND LUTS <b>◆</b> VOICE DIRECTION <b>◆</b> RENDER QUEUE <b>◆</b></span>
+    <span>BRIEF PARSING <b>◆</b> SCENE PLANNING <b>◆</b> CLIP RETRIEVAL <b>◆</b> AUTO TITLES <b>◆</b> BEAT-SYNCED CUTS <b>◆</b> BRAND LUTS <b>◆</b> VOICE DIRECTION <b>◆</b> RENDER QUEUE <b>◆</b></span>
+  </div></div>
+
+  <section id="pipeline"><div class="wrap">
+    <div class="sec-head" data-rv><h2>One brief, three passes.</h2><span class="micro">the pipeline</span></div>
+    <div class="steps">
+      <div class="step" data-rv><span class="n">PASS 01</span><h3>Read the brief</h3><p>Pull audience, tone, length and brand constraints out of plain language — no forms, no node graphs.</p></div>
+      <div class="step" data-rv><span class="n">PASS 02</span><h3>Plan the cut</h3><p>Scene-by-scene plan with timings, title cards and music direction before a single clip is placed.</p></div>
+      <div class="step" data-rv><span class="n">PASS 03</span><h3>Lay the timeline</h3><p>Clips, transitions, captions and mix land on editable tracks. Steer anything; re-render only what changed.</p></div>
+    </div>
+  </div></section>
+
+  <section id="editor"><div class="wrap">
+    <div class="sec-head" data-rv><h2>An editor, not a black box.</h2><span class="micro">control surface</span></div>
+    <div class="tabs" data-rv>
+      <button class="tab on" data-tab="cut">Cut</button><button class="tab" data-tab="color">Color</button><button class="tab" data-tab="audio">Audio</button>
+    </div>
+    <div class="panel" id="p-cut" data-rv>
+      <div class="kv">
+        <div class="cell"><span class="k">Scenes</span><span class="v cy" id="kScenes">6</span></div>
+        <div class="cell"><span class="k">Runtime</span><span class="v vi">00:15</span></div>
+        <div class="cell"><span class="k">Titles</span><span class="v mg">4</span></div>
+        <div class="cell"><span class="k">Cuts / min</span><span class="v gr">24</span></div>
+      </div>
+      <div class="sliders">
+        <label class="slider">PACING<input type="range" min="8" max="40" value="24" data-out="oPace" /><output id="oPace">24</output></label>
+        <label class="slider">TITLE DENSITY<input type="range" min="0" max="8" value="4" data-out="oTitle" /><output id="oTitle">4</output></label>
+      </div>
+    </div>
+    <div class="panel" id="p-color" hidden>
+      <div class="kv">
+        <div class="cell"><span class="k">LUT</span><span class="v cy">TROPICAL-01</span></div>
+        <div class="cell"><span class="k">Exposure</span><span class="v vi">+0.3</span></div>
+        <div class="cell"><span class="k">Saturation</span><span class="v mg">1.12</span></div>
+        <div class="cell"><span class="k">Grain</span><span class="v gr">3%</span></div>
+      </div>
+      <div class="sliders">
+        <label class="slider">TEMPERATURE<input type="range" min="-50" max="50" value="12" data-out="oTemp" /><output id="oTemp">12</output></label>
+        <label class="slider">CONTRAST<input type="range" min="-50" max="50" value="8" data-out="oCon" /><output id="oCon">8</output></label>
+      </div>
+    </div>
+    <div class="panel" id="p-audio" hidden>
+      <div class="kv">
+        <div class="cell"><span class="k">Bed</span><span class="v cy">AFRO-POP 108</span></div>
+        <div class="cell"><span class="k">VO</span><span class="v vi">WARM-F-02</span></div>
+        <div class="cell"><span class="k">Duck</span><span class="v mg">-6 dB</span></div>
+        <div class="cell"><span class="k">Loudness</span><span class="v gr">-14 LUFS</span></div>
+      </div>
+      <div class="sliders">
+        <label class="slider">MUSIC LEVEL<input type="range" min="-24" max="0" value="-8" data-out="oMus" /><output id="oMus">-8</output></label>
+        <label class="slider">VO LEVEL<input type="range" min="-24" max="0" value="-3" data-out="oVo" /><output id="oVo">-3</output></label>
+      </div>
+    </div>
+  </div></section>
+
+  <section id="renders"><div class="wrap">
+    <div class="sec-head" data-rv><h2>Render queue.</h2><button class="btn" id="addRender">+ New render</button></div>
+    <div class="queue" id="queue" data-rv></div>
+  </div></section>
+
+  <section id="access"><div class="wrap">
+    <div class="access" data-rv>
+      <div>
+        <span class="micro">early access</span>
+        <h2 style="margin:.6rem 0 .8rem">Put your brief in the queue.</h2>
+        <p style="color:var(--muted)">Solo-built, shipping weekly. Leave an email and I'll send an invite when your slot opens.</p>
+      </div>
+      <div>
+        <form id="accessForm" novalidate>
+          <input type="email" id="accessEmail" placeholder="you@brand.com" aria-label="Email" />
+          <button class="btn btn--solid" type="submit">Join</button>
+        </form>
+        <div class="err" id="accessErr"></div>
+        <div class="ok" id="accessOk"></div>
+      </div>
+    </div>
+  </div></section>
+</main>
+
+<footer><div class="wrap">
+  <span class="micro">AI Video Studio — a Jordan Nwachukwu product</span>
+  <span class="micro">prompt → timeline · built solo</span>
+</div></footer>
+
+<script>
+const $ = s => document.querySelector(s);
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+/* reveal */
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .15 });
+document.querySelectorAll('[data-rv]').forEach(el => io.observe(el));
+/* meters */
+const meters = $('#meters');
+for (let i = 0; i < 24; i++) { const b = document.createElement('i'); b.style.animationDelay = (i * .07) + 's'; b.style.animationDuration = (.7 + (i % 5) * .13) + 's'; meters.appendChild(b); }
+/* timeline generation */
+const words = t => t.toLowerCase().replace(/[^a-z0-9 ]/g, '').split(/\s+/).filter(w => w.length > 3);
+let phRaf = null;
+function generate() {
+  const brief = $('#brief').value.trim() || 'brand cut';
+  const w = words(brief);
+  const st = $('#status'); st.className = 'statusline busy'; st.textContent = 'parsing brief → planning scenes…';
+  ['trV', 'trV2', 'trA', 'trT'].forEach(id => { const t = $('#' + id); t.querySelectorAll('.clip').forEach(c => c.remove()); });
+  const names = [w[0] || 'open', w[1] || 'hook', w[2] || 'product', w[3] || 'proof', w[4] || 'pack', 'endcard'];
+  setTimeout(() => {
+    st.textContent = 'laying clips + titles + mix…';
+    const widths = [18, 14, 20, 16, 18, 14];
+    names.forEach((n, i) => {
+      const c = document.createElement('div');
+      c.className = 'clip ' + (i % 2 ? 'v2' : 'v');
+      c.style.flex = widths[i]; c.style.animationDelay = (i * .09) + 's'; c.textContent = n.toUpperCase();
+      $('#trV').appendChild(c);
+    });
+    [30, 26, 44].forEach((f, i) => { const c = document.createElement('div'); c.className = 'clip v2'; c.style.flex = f; c.style.animationDelay = (.3 + i * .1) + 's'; c.textContent = ['B-ROLL', 'DETAIL', 'PACK'][i]; $('#trV2').appendChild(c); });
+    const a = document.createElement('div'); a.className = 'clip a'; a.style.flex = 1; a.textContent = 'BED · 108 BPM'; $('#trA').appendChild(a);
+    [22, 30, 26, 22].forEach((f, i) => { const c = document.createElement('div'); c.className = 'clip t'; c.style.flex = f; c.style.animationDelay = (.5 + i * .08) + 's'; c.textContent = ['HOOK', 'BENEFIT', 'PROOF', 'CTA'][i]; $('#trT').appendChild(c); });
+    $('#kScenes').textContent = names.length;
+    setTimeout(() => { st.className = 'statusline'; st.textContent = 'cut laid — 6 scenes · 00:15 · ready to steer'; runPlayhead(); }, reduce ? 0 : 900);
+  }, reduce ? 0 : 700);
+}
+function runPlayhead() {
+  if (reduce) return;
+  cancelAnimationFrame(phRaf);
+  const tl = $('#tl'), ph = $('#ph'), scene = $('#scene'), tc = $('#tc');
+  const scenes = [...document.querySelectorAll('#trV .clip')].map(c => c.textContent);
+  const t0 = performance.now(), dur = 6000;
+  function frame(now) {
+    const t = ((now - t0) % dur) / dur;
+    const x = 44 + t * (tl.clientWidth - 60);
+    ph.style.left = x + 'px';
+    const idx = Math.min(scenes.length - 1, Math.floor(t * scenes.length));
+    scene.textContent = 'SCENE ' + (idx + 1) + ' · ' + scenes[idx];
+    const s = Math.floor(t * 15);
+    tc.textContent = '00:00:' + String(s).padStart(2, '0');
+    phRaf = requestAnimationFrame(frame);
+  }
+  phRaf = requestAnimationFrame(frame);
+}
+$('#gen').addEventListener('click', generate);
+/* tabs */
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x === t));
+  ['cut', 'color', 'audio'].forEach(k => { $('#p-' + k).hidden = k !== t.dataset.tab; });
+}));
+/* sliders live */
+document.querySelectorAll('.slider input').forEach(r => r.addEventListener('input', () => { $('#' + r.dataset.out).textContent = r.value; }));
+/* render queue */
+let qn = 0;
+function addRender(name, done) {
+  qn++;
+  const row = document.createElement('div'); row.className = 'qrow';
+  row.innerHTML = '<span class="name">' + name + '</span><span class="bar"><i></i></span><span class="chip run">rendering</span>';
+  $('#queue').prepend(row);
+  const bar = row.querySelector('.bar i'), chip = row.querySelector('.chip');
+  let p = done ? 100 : 0;
+  bar.style.width = p + '%';
+  if (done) { chip.className = 'chip done'; chip.textContent = 'delivered'; return; }
+  const iv = setInterval(() => {
+    p = Math.min(100, p + 3 + Math.random() * 6);
+    bar.style.width = p + '%';
+    if (p >= 100) { clearInterval(iv); chip.className = 'chip done'; chip.textContent = 'delivered'; }
+  }, 260);
+}
+addRender('launch-cut_v3.mp4 · 1080p', true);
+addRender('hook-test_A.mp4 · 9x16', true);
+addRender('pack-shot_loop.mp4 · 1x1', false);
+$('#addRender').addEventListener('click', () => addRender('brief-' + String(qn + 1).padStart(3, '0') + '.mp4 · 1080p', false));
+/* access form */
+$('#accessForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const v = $('#accessEmail').value.trim();
+  const ok = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+  $('#accessErr').textContent = ok ? '' : 'Add a valid email to join the queue.';
+  $('#accessOk').textContent = ok ? 'Queued — invite lands when your slot opens.' : '';
+  if (ok) $('#accessEmail').value = '';
+});
+generate();
+</script>
+</body>
+</html>

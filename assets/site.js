@@ -191,6 +191,9 @@
   function showPreview(id){ const src=imgOf(id); if(!src)return;
     if(pvActive&&pvId===id) return;
     pvId=id; pvDirty=true; previewImg.src=src;
+    /* cover first (instant), then the captured hover GIF once decoded */
+    const gif=DATA.gifs&&DATA.gifs[id];
+    if(gif){ const im=new Image(); im.onload=()=>{ if(pvId===id) previewImg.src=gif; }; im.src=gif; }
     if(hasG&&!reduce){G.to(preview,{opacity:1,duration:.4,ease:'power3.out',overwrite:true});}else{preview.style.opacity=1;}
     pvActive=true; }
   function hidePreview(){ pvId=null;
@@ -466,6 +469,26 @@
       }
     }
     if(current==='contact') bindForm();
+    if(current==='project'){
+      /* case videos: play in view, pause out of view; click / key toggles */
+      const vids=$$('video[data-casevideo]',page);
+      if(vids.length){
+        const toggle=v=>{ if(v.paused){ const p=v.play(); if(p&&p.catch)p.catch(()=>{}); } else v.pause(); };
+        const onClick=e=>toggle(e.currentTarget);
+        const onKey=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggle(e.currentTarget); } };
+        vids.forEach(v=>{ v.addEventListener('click',onClick); v.addEventListener('keydown',onKey); });
+        let vio=null;
+        if(!reduce && 'IntersectionObserver' in window){
+          vio=new IntersectionObserver(es=>es.forEach(en=>{
+            const v=en.target;
+            if(en.isIntersecting){ const p=v.play(); if(p&&p.catch)p.catch(()=>{}); }
+            else v.pause();
+          }),{threshold:.25});
+          vids.forEach(v=>vio.observe(v));
+        }
+        pageCleanup.push(()=>{ if(vio)vio.disconnect(); vids.forEach(v=>{ v.pause(); v.removeEventListener('click',onClick); v.removeEventListener('keydown',onKey); }); });
+      }
+    }
     // page-specific scroll FX
     initWordReveal(); initScrollFX(); initMarqueeScroll();
     // reveal anything already in view on the new page

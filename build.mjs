@@ -62,9 +62,21 @@ function fillCase(tpl, p) {
   sub('id="caseYear"></p>', 'id="caseYear">' + esc(p.year) + '</p>');
   if (!/<img id="caseImg"[^>]*\/>/.test(tpl)) throw new Error('caseImg missing');
   tpl = tpl.replace(/<img id="caseImg"[^>]*\/>/, '<img id="caseImg" src="' + p.img + '" alt="' + esc(p.title + ' - project cover') + '" />');
+  const m = p.media;
+  const vid = (id, src, label) => '<video id="' + id + '" data-casevideo muted loop playsinline preload="metadata" tabindex="0" aria-label="' + esc(label) + '" src="' + src + '" poster="' + m.poster + '"></video>';
+  tpl = tpl.replace(/<video id="caseTour"[^>]*><\/video>/, vid('caseTour', m.tour, p.title + ' desktop walkthrough - click to pause or play'));
+  tpl = tpl.replace(/<video id="caseFlow"[^>]*><\/video>/, vid('caseFlow', m.flow, p.title + ' secondary flow - click to pause or play'));
+  const shot = (id, src, alt) => '<img id="' + id + '" src="' + src + '" alt="' + esc(alt) + '" loading="lazy" />';
+  tpl = tpl.replace(/<img id="caseDetail"[^>]*\/>/, shot('caseDetail', m.detail, p.title + ' - detail shot'));
+  tpl = tpl.replace(/<img id="caseFull"[^>]*\/>/, shot('caseFull', m.full, p.title + ' - full-width site visual'));
+  tpl = tpl.replace(/<img id="caseM1"[^>]*\/>/, shot('caseM1', m.m[0], p.title + ' - mobile screen 1'));
+  tpl = tpl.replace(/<img id="caseM2"[^>]*\/>/, shot('caseM2', m.m[1], p.title + ' - mobile screen 2'));
+  tpl = tpl.replace(/<img id="caseM3"[^>]*\/>/, shot('caseM3', m.m[2], p.title + ' - mobile screen 3'));
+  sub('id="caseMobileCap">Mobile experience<', 'id="caseMobileCap">Mobile experience - ' + esc(p.title) + '<');
   const liveOpen = '<div class="case-live-row"><a class="btn" id="caseLive" target="_blank" rel="noopener">';
   if (p.url) sub(liveOpen, '<div class="case-live-row"><a class="btn" id="caseLive" href="' + esc(p.url) + '" target="_blank" rel="noopener">');
   else sub(liveOpen, '<div class="case-live-row" style="display:none"><a class="btn" id="caseLive" target="_blank" rel="noopener">');
+  sub('<span>Live site</span>', '<span>' + (p.url && p.url.charAt(0) === '/' ? 'Open mockup' : 'Live site') + '</span>');
   sub('id="caseDesc" data-reveal></p>', 'id="caseDesc" data-reveal>' + esc(p.desc) + '</p>');
   sub('id="caseOutcome"></span>', 'id="caseOutcome">' + esc(p.outcome) + '</span>');
   sub('id="caseTags" data-reveal></div>', 'id="caseTags" data-reveal>' + p.tags.map(t => '<span class="card__tag">' + esc(t) + '</span>').join('') + '</div>');
@@ -76,6 +88,7 @@ function fillCase(tpl, p) {
 /* ---------- client data island (preview images + curtain labels) ---------- */
 const ISLAND = JSON.stringify({
   imgs: Object.fromEntries(PROJECTS.map(p => [p.id, p.img])),
+  gifs: Object.fromEntries(PROJECTS.map(p => [p.id, p.media.gif])),
   titles: Object.fromEntries(PROJECTS.map(p => [p.id, p.title]))
 });
 

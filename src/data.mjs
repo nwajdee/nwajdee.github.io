@@ -13,7 +13,7 @@ export const PROJECTS = [
   {id:'bonita',title:'Bonita Foods',cat:'Ecom Design & Development',year:'2024',img:'/assets/bonita.jpg',url:'https://bonitafoods.com.ng',role:'Strategy · Build · Content',
    desc:'A Nigerian coconut-snack brand. I built the WooCommerce storefront, shaped the product story and packaging presentation, and ran the content and ad creative that point at it.',
    tags:['WooCommerce','Content','Ad Creative','Media Buying'],outcome:'[ROAS] · [revenue lift] · [conversion rate] - figures supplied by Jordan.'},
-  {id:'rachy',title:'Rachy Clothing',cat:'Ecom Design & Development',year:'2024',img:'/assets/rachy.jpg',url:'https://rachyclothing.com',role:'Design · Build · Content',
+  {id:'rachy',title:'Rachy Clothing',cat:'Ecom Design & Development',year:'2024',img:'/assets/rachy.jpg',url:'https://rachyclothings.com',role:'Design · Build · Content',
    desc:'A contemporary fashion label. Shopify storefront, lookbook-style product photography direction, and a content engine feeding paid social.',
    tags:['Shopify','Brand','Video','Media Buying'],outcome:'[hold rate] · [ROAS] · [AOV] - figures supplied by Jordan.'},
   {id:'camille',title:'Camille Bisou',cat:'Ecom Design & Development',year:'2023',img:'/assets/camille.jpg',url:'https://camillebisou.com',role:'Brand · Funnel · Build',
@@ -28,10 +28,10 @@ export const PROJECTS = [
   {id:'jmks',title:"JMK's Hair",cat:'Beauty & Ecommerce',year:'2023',img:'/assets/jmks.jpg',url:'https://jmkshair.com',role:'Design · Build · Content',
    desc:'A hair and beauty brand. Storefront, product presentation and the content that shows the result - built to sell a tactile product online.',
    tags:['Ecommerce','Beauty','Content','Social'],outcome:'[ROAS] · [repeat rate] - figures supplied by Jordan.'},
-  {id:'acioe',title:'ACIOE',cat:'Organization & Web',year:'2022',img:'/assets/acioe.jpg',url:'https://acioe.org',role:'Design · Build',
+  {id:'acioe',title:'ACIOE',cat:'Organization & Web',year:'2022',img:'/assets/acioe.jpg',url:'https://acioe.com',role:'Design · Build',
    desc:'An organization’s public home. Clear information architecture, event and programme pages, and a credible, fast web presence.',
    tags:['Web','Information Architecture','CMS'],outcome:'[traffic] · [engagement] - figures supplied by Jordan.'},
-  {id:'acioefoundation',title:'ACIOE Foundation',cat:'NGO & Web',year:'2022',img:'/assets/acioe.jpg',url:'https://acioefoundation.com',role:'Design · Build',
+  {id:'acioefoundation',title:'ACIOE Foundation',cat:'NGO & Web',year:'2022',img:'/assets/acioe.jpg',url:'https://acioefoundation.org',role:'Design · Build',
    desc:'The foundation arm. A mission-led site that communicates impact and makes it easy to support, learn and get involved.',
    tags:['NGO','Web','Storytelling','CMS'],outcome:'[reach] · [donations] - figures supplied by Jordan.'},
   {id:'ai-studio',title:'AI Video Studio',cat:'Product & Development',year:'2025',img:'/assets/ai-studio.jpg',url:null,role:'Founder · Product · Engineering',
@@ -54,3 +54,26 @@ export const SERVICES = [
 ];
 
 export const RECENT = ['bonita','rachy','camille','ai-studio'];
+
+/* ---------- captured media (assets/work/) ----------
+   Covers, HD screenshots, product-page detail, mobile screens,
+   cinematic tour + flow video, poster frame and hover GIF per project.
+   Site-less products carry website mockups + a 3D turntable (orbit). */
+const W = '/assets/work/';
+for (const p of PROJECTS) {
+  p.img = W + p.id + '-cover.jpg';
+  p.media = {
+    detail: W + p.id + '-detail.jpg',
+    full: W + p.id + '-full.jpg',
+    m: [W + p.id + '-m1.jpg', W + p.id + '-m2.jpg', W + p.id + '-m3.jpg'],
+    tour: W + p.id + '-tour.mp4',
+    flow: W + p.id + '-flow.mp4',
+    poster: W + p.id + '-poster.jpg',
+    gif: W + p.id + '-loop.gif'
+  };
+}
+for (const id of ['ai-studio', 'saas', 'study-abroad']) {
+  const p = PROJECTS.find(x => x.id === id);
+  p.url = '/src/mockups/' + id + '/';
+  p.media.flow = W + id + '-orbit.mp4';
+}

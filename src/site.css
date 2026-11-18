@@ -357,6 +357,13 @@ a.work-row,a.card__open{text-decoration:none;color:inherit}
 .phones figcaption{grid-column:1/-1;text-align:center;margin-top:.4rem}
 .phone{border:1px solid var(--line-soft);background:var(--surface-2);border-radius:clamp(18px,2.4vw,30px);padding:clamp(6px,.8vw,10px)}
 .phone .ph{aspect-ratio:239/485;border-radius:clamp(12px,1.8vw,22px);padding:.8rem;letter-spacing:.14em}
+.screen{aspect-ratio:16/10;border-radius:8px;overflow:hidden;background:var(--surface-2)}
+.screen video{width:100%;height:100%;object-fit:cover;display:block;cursor:pointer}
+.shot{aspect-ratio:16/10;border-radius:clamp(14px,2vw,22px);overflow:hidden;background:var(--surface-2)}
+.shot img{width:100%;height:100%;object-fit:cover;display:block}
+.shot--full{border-radius:0;aspect-ratio:21/9}
+.shot--phone{aspect-ratio:239/485;border-radius:clamp(12px,1.8vw,22px)}
+.shot--phone img{object-position:top}
 .case-copy{padding-block:0 clamp(3rem,7vw,6rem)}
 .case-copy .wrap--medium{max-width:880px}
 .case-desc{font-size:clamp(1.05rem,1.6vw,1.35rem);line-height:1.65}
