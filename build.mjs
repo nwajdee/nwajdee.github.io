@@ -247,6 +247,26 @@ function fillPost(tpl, p) {
   return tpl;
 }
 
+/* ---------- breadcrumbs (every page except home) ---------- */
+const CRUMB_LABELS = { work: 'Work', about: 'About', contact: 'Contact', resources: 'Resources', books: 'Books', academy: 'Academy', blog: 'Blog' };
+function renderCrumbs(def) {
+  if (def.partial === 'home') return '';
+  const segs = def.path.split('/').filter(Boolean);
+  const items = [{ href: '/', label: 'Home' }];
+  let acc = '/';
+  segs.forEach((s, i) => {
+    acc += s + '/';
+    const last = i === segs.length - 1;
+    const label = last
+      ? (def.project ? def.project.title : def.book ? def.book.title : def.post ? def.post.title : def.partial === '404' ? 'Page not found' : CRUMB_LABELS[s] || s)
+      : CRUMB_LABELS[s] || s;
+    items.push({ href: last ? '' : acc, label });
+  });
+  return '<nav class="crumbs" aria-label="Breadcrumb"><ol class="crumbs__list mono">' +
+    items.map(it => '<li>' + (it.href ? '<a href="' + it.href + '">' + esc(it.label) + '</a>' : '<span aria-current="page">' + esc(it.label) + '</span>') + '</li>').join('') +
+    '</ol></nav>';
+}
+
 /* ---------- client data island (preview images + curtain labels + book textures) ---------- */
 const ISLAND = JSON.stringify({
   imgs: Object.fromEntries(PROJECTS.map(p => [p.id, p.img])),
@@ -325,6 +345,16 @@ function emit(def) {
   if (def.partial === 'book') pageHtml = fillBook(pageHtml, def.book);
   if (def.partial === 'post') pageHtml = fillPost(pageHtml, def.post);
   if (def.partial === 'case') pageHtml = fillCase(pageHtml, def.project);
+  const crumbs = renderCrumbs(def);
+  if (crumbs) {
+    const anchor = def.partial === 'post' ? '<header class="post__head">' : def.partial === 'book' ? '<section class="bl-hero wrap">' : '';
+    if (anchor) {
+      if (!pageHtml.includes(anchor)) throw new Error('crumb anchor missing in ' + def.partial);
+      pageHtml = pageHtml.replace(anchor, anchor + crumbs);
+    } else {
+      pageHtml = pageHtml.replace(/<section class="[^"]*wrap">/, m => m + crumbs);
+    }
+  }
   if (!pageHtml.includes('class="page"')) throw new Error('page div missing in ' + def.partial);
   pageHtml = pageHtml.replace('class="page"', 'class="page active" data-curtain="' + esc(def.curtain) + '"');
 
