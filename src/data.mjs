@@ -348,7 +348,7 @@ export const ACADEMY = {
 export const POSTS = [
   {
     id: 'red-lips-study', cat: 'Attention', book: 'attention-hacking',
-    title: 'The red-lips study: attention is not shared equally',
+    title: 'The lipstick hypothesis: The study that demystified human attention',
     dek: 'Fifty men, one hundred faces, and an eye-tracker. The seven-second result that explains why your best post died in the feed.',
     date: '2026-11-18', read: '6 min read',
     body: `
@@ -387,7 +387,7 @@ export const POSTS = [
   },
   {
     id: 'four-money-routes', cat: 'Japa', book: 'japa-free',
-    title: 'Dem go pay you to school abroad: the four money routes',
+    title: 'Get paid to study abroad: the four surprising doors',
     dek: 'Tuition-free, fully funded, paid PhD, paid fellowship. What each one actually pays - and what "free" still costs you in naira.',
     date: '2026-11-18', read: '8 min read',
     body: `
