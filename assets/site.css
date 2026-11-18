@@ -239,7 +239,7 @@ section{position:relative}
 .hero__role{position:absolute;right:var(--pad);top:50%;translate:0 -50%;z-index:3;color:#F8F6F2}
 .hero__role .arr{position:absolute;left:0;top:calc(-1.25rem - clamp(20px,2vw,28px));width:clamp(20px,2vw,28px);height:clamp(20px,2vw,28px)}
 .hero__role p{margin:0;font-size:clamp(1.2rem,2.2vw,2rem);line-height:1.25;font-weight:500}
-@media(max-width:760px){
+@media(max-width:820px){
   .hero{min-height:75svh}
   .hero__name{font-size:28vw;top:50%;bottom:auto;transform:translateY(-50%)}
   /* black pill collapses to just the spinning globe on the right */
