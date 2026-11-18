@@ -385,6 +385,11 @@
       const heroImg=$('#heroImg');
       if(heroImg){ G.to(heroImg,{yPercent:-12,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:true}}); }
     }
+    // footer parallax reveal (reference site)
+    const footer=$('#footer');
+    if(footer){
+      G.fromTo(footer,{yPercent:12,opacity:.6},{yPercent:0,opacity:1,ease:'none',scrollTrigger:{trigger:footer,start:'top bottom',end:'top 60%',scrub:true}});
+    }
     if(current==='work'){
       // scale + dim each card as the NEXT card rises to cover it
       const arr=$$('.card');
