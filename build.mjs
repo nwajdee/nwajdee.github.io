@@ -160,7 +160,6 @@ function fillBook(tpl, b) {
 
   sub('<div class="bl-copy" id="bkHeroCopy"></div>',
     '<div class="bl-copy" id="bkHeroCopy">' +
-      '<div class="sec-label micro" data-reveal>' + esc(b.eyebrow) + '</div>' +
       '<h1 class="bl-title" data-reveal>' + esc(b.hook) + '</h1>' +
       '<p class="bl-book mono" data-reveal>' + esc(b.title) + ' - ' + esc(b.subtitle) + '</p>' +
       '<p class="bl-lede" data-reveal>' + esc(b.lede) + '</p>' +
