@@ -151,10 +151,13 @@ html[data-theme="light"] .header.over-hero .header__brand .c{color:rgba(248,246,
 .theme-toggle{position:relative;flex:none;width:40px;height:40px;border-radius:50%;border:1px solid color-mix(in srgb,currentColor 35%,transparent);background:transparent;color:currentColor;display:grid;place-items:center;cursor:pointer;transition:border-color .3s,background .3s}
 .theme-toggle:hover{border-color:currentColor}
 .theme-toggle svg{position:absolute;width:17px;height:17px;transition:transform .5s var(--ease),opacity .35s}
-.theme-toggle .sun{opacity:0;transform:rotate(-90deg) scale(.4)}
+.theme-toggle .sun{opacity:0;transform:rotate(-90deg)}
 .theme-toggle .moon{opacity:1;transform:none}
 html[data-theme="light"] .theme-toggle .sun{opacity:1;transform:none}
-html[data-theme="light"] .theme-toggle .moon{opacity:0;transform:rotate(90deg) scale(.4)}
+html[data-theme="light"] .theme-toggle .moon{opacity:0;transform:rotate(90deg)}
+/* keep the crossfade full-size and let the ink snap with the theme: the global
+   theme-switching stroke ease would otherwise leave a pale icon on pale bg */
+html.theme-switching .theme-toggle svg{transition:transform .5s var(--ease),opacity .35s!important}
 html.no-js .theme-toggle{display:none}
 @media(max-width:760px){.header__nav .header__link{display:none}.header__nav{gap:1rem}}
 
