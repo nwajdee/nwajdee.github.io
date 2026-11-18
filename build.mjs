@@ -132,13 +132,12 @@ function renderHubNotes() {
 }
 function renderBlogIndex() {
   return POSTS.map(p => {
-    const b = bookById(p.book);
     return '<article class="post-card" data-cat="' + esc(p.cat) + '" data-reveal>' +
       '<a href="' + p.href + '">' +
         '<div class="post-card__meta mono"><span class="post-card__cat">' + esc(p.cat) + '</span><span>' + esc(p.read) + '</span></div>' +
         '<h2 class="post-card__title">' + esc(p.title) + '</h2>' +
         '<p class="post-card__dek">' + esc(p.dek) + '</p>' +
-        '<div class="post-card__foot"><span class="mono">' + fmtDate(p.date) + '</span><span class="post-card__book mono">From the book · ' + esc(b.title) + '</span>' + ARR + '</div>' +
+        '<div class="post-card__foot"><span class="mono">' + fmtDate(p.date) + '</span>' + ARR + '</div>' +
       '</a></article>';
   }).join('\n');
 }

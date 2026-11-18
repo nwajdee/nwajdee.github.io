@@ -801,7 +801,6 @@ html[data-theme="light"] .post-card[data-cat="Japa"]{--pc:#0B3D2E}
 .post-card__title{font-size:clamp(1.3rem,1.8vw,1.6rem);font-weight:600;line-height:1.15;letter-spacing:-.01em;margin-top:1rem}
 .post-card__dek{color:var(--muted);font-size:.95rem;line-height:1.6;margin-top:.8rem}
 .post-card__foot{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-top:auto;padding-top:1.4rem;font-size:.64rem;color:var(--faint)}
-.post-card__book{color:var(--muted);text-transform:uppercase;letter-spacing:.1em;text-align:right}
 .post-card__foot .arr{width:18px;flex-shrink:0}
 .posts-empty{text-align:center;color:var(--faint);padding:3rem 0 6rem;font-size:.72rem;text-transform:uppercase;letter-spacing:.14em}
 
