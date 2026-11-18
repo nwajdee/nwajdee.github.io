@@ -53,6 +53,17 @@
   <nav class="header__nav" aria-label="Primary">
     <a href="/work/" class="header__link" data-route="work">Work</a>
     <a href="/about/" class="header__link" data-route="about">About</a>
+    <div class="nav-drop" id="navDrop">
+      <a href="/resources/" class="header__link" data-route="resources">Resources</a>
+      <button type="button" class="nav-drop__caret" id="navDropCaret" aria-label="Toggle resources submenu" aria-expanded="false" aria-controls="navDropMenu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="nav-drop__menu" id="navDropMenu">
+        <a href="/resources/books/" class="nav-drop__item"><span class="nav-drop__name">Books</span><span class="nav-drop__desc mono">3 titles · 1 free</span></a>
+        <a href="/resources/academy/" class="nav-drop__item"><span class="nav-drop__name">Academy</span><span class="nav-drop__desc mono">Live bootcamp</span></a>
+        <a href="/resources/blog/" class="nav-drop__item"><span class="nav-drop__name">Blog</span><span class="nav-drop__desc mono">Field notes</span></a>
+      </div>
+    </div>
     <a href="/contact/" class="header__link" data-route="contact">Contact</a>
     <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode" aria-pressed="false" data-magnetic>
       <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/></svg>
@@ -72,7 +83,15 @@
       <a href="/" class="menu__link" data-route="home"><span class="idx">01</span><span class="line-mask"><span class="txt">Home</span></span></a>
       <a href="/work/" class="menu__link" data-route="work"><span class="idx">02</span><span class="line-mask"><span class="txt">Work</span></span></a>
       <a href="/about/" class="menu__link" data-route="about"><span class="idx">03</span><span class="line-mask"><span class="txt">About</span></span></a>
-      <a href="/contact/" class="menu__link" data-route="contact"><span class="idx">04</span><span class="line-mask"><span class="txt">Contact</span></span></a>
+      <div class="menu__group">
+        <a href="/resources/" class="menu__link" data-route="resources"><span class="idx">04</span><span class="line-mask"><span class="txt">Resources</span></span></a>
+        <div class="menu__sub">
+          <a href="/resources/books/">Books</a>
+          <a href="/resources/academy/">Academy</a>
+          <a href="/resources/blog/">Blog</a>
+        </div>
+      </div>
+      <a href="/contact/" class="menu__link" data-route="contact"><span class="idx">05</span><span class="line-mask"><span class="txt">Contact</span></span></a>
     </nav>
     <div class="menu__aside">
       <div class="menu__img"><img src="/assets/about-studio.jpg" alt="Jordan's studio workspace" loading="lazy" /></div>
@@ -138,7 +157,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" integrity="sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" integrity="sha384-Z3REaz79l2IaAZqJsSABtTbhjgOUYyV3p90XNnAPCSHg3EMTz1fouunq9WZRtj3d" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js" integrity="sha384-li4UtcFCH6QeUqR4JyV58/VgTprMuz9aauj+oWtew7V4Y7ZVjnvz5px9Y3UCG0Ea" crossorigin="anonymous"></script>
-<script>window.__JN={"imgs":{"bonita":"/assets/work/bonita-cover.jpg","rachy":"/assets/work/rachy-cover.jpg","camille":"/assets/work/camille-cover.jpg","luxe":"/assets/work/luxe-cover.jpg","luxeambiance":"/assets/work/luxeambiance-cover.jpg","jmks":"/assets/work/jmks-cover.jpg","acioe":"/assets/work/acioe-cover.jpg","acioefoundation":"/assets/work/acioefoundation-cover.jpg","ai-studio":"/assets/work/ai-studio-cover.jpg","saas":"/assets/work/saas-cover.jpg","study-abroad":"/assets/work/study-abroad-cover.jpg"},"gifs":{"bonita":"/assets/work/bonita-loop.gif","rachy":"/assets/work/rachy-loop.gif","camille":"/assets/work/camille-loop.gif","luxe":"/assets/work/luxe-loop.gif","luxeambiance":"/assets/work/luxeambiance-loop.gif","jmks":"/assets/work/jmks-loop.gif","acioe":"/assets/work/acioe-loop.gif","acioefoundation":"/assets/work/acioefoundation-loop.gif","ai-studio":"/assets/work/ai-studio-loop.gif","saas":"/assets/work/saas-loop.gif","study-abroad":"/assets/work/study-abroad-loop.gif"},"titles":{"bonita":"Bonita Foods","rachy":"Rachy Clothing","camille":"Camille Bisou","luxe":"Luxe Party Shop","luxeambiance":"Luxe Ambiance Events","jmks":"JMK's Hair","acioe":"ACIOE","acioefoundation":"ACIOE Foundation","ai-studio":"AI Video Studio","saas":"Multi-tenant SaaS","study-abroad":"Study Abroad For Free"}};</script>
+<script>window.__JN={"imgs":{"bonita":"/assets/work/bonita-cover.jpg","rachy":"/assets/work/rachy-cover.jpg","camille":"/assets/work/camille-cover.jpg","luxe":"/assets/work/luxe-cover.jpg","luxeambiance":"/assets/work/luxeambiance-cover.jpg","jmks":"/assets/work/jmks-cover.jpg","acioe":"/assets/work/acioe-cover.jpg","acioefoundation":"/assets/work/acioefoundation-cover.jpg","ai-studio":"/assets/work/ai-studio-cover.jpg","saas":"/assets/work/saas-cover.jpg","study-abroad":"/assets/work/study-abroad-cover.jpg"},"gifs":{"bonita":"/assets/work/bonita-loop.gif","rachy":"/assets/work/rachy-loop.gif","camille":"/assets/work/camille-loop.gif","luxe":"/assets/work/luxe-loop.gif","luxeambiance":"/assets/work/luxeambiance-loop.gif","jmks":"/assets/work/jmks-loop.gif","acioe":"/assets/work/acioe-loop.gif","acioefoundation":"/assets/work/acioefoundation-loop.gif","ai-studio":"/assets/work/ai-studio-loop.gif","saas":"/assets/work/saas-loop.gif","study-abroad":"/assets/work/study-abroad-loop.gif"},"titles":{"bonita":"Bonita Foods","rachy":"Rachy Clothing","camille":"Camille Bisou","luxe":"Luxe Party Shop","luxeambiance":"Luxe Ambiance Events","jmks":"JMK's Hair","acioe":"ACIOE","acioefoundation":"ACIOE Foundation","ai-studio":"AI Video Studio","saas":"Multi-tenant SaaS","study-abroad":"Study Abroad For Free"},"books":{"attention-hacking":{"t":"Attention Hacking","a":["/assets/books/covers/attention-hacking-a-front.jpg","/assets/books/covers/attention-hacking-a-back.jpg"],"b":["/assets/books/covers/attention-hacking-b-front.jpg","/assets/books/covers/attention-hacking-b-back.jpg"],"c":["#FF4B3E","#C43A2E"],"p":"Free"},"your-first-ai-staff":{"t":"Your First AI Staff","a":["/assets/books/covers/your-first-ai-staff-a-front.jpg","/assets/books/covers/your-first-ai-staff-a-back.jpg"],"b":["/assets/books/covers/your-first-ai-staff-b-front.jpg","/assets/books/covers/your-first-ai-staff-b-back.jpg"],"c":["#7C8CFF","#455CE9"],"p":"₦9,900"},"japa-free":{"t":"JAPA FREE","a":["/assets/books/covers/japa-free-a-front.jpg","/assets/books/covers/japa-free-a-back.jpg"],"b":["/assets/books/covers/japa-free-b-front.jpg","/assets/books/covers/japa-free-b-back.jpg"],"c":["#4CC38A","#0B3D2E"],"p":"₦15,000"}},"posts":{"red-lips-study":{"t":"The red-lips study: attention is not shared equally"},"six-jobs":{"t":"You're not lazy. You're doing six jobs."},"four-money-routes":{"t":"Dem go pay you to school abroad: the four money routes"}}};</script>
 <script src="/assets/site.js"></script>
 </body>
 </html>

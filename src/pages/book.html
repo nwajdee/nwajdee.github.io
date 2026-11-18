@@ -1,0 +1,102 @@
+<div class="page" id="page-book" data-page="book" style="--bk:{{BK_D}};--bk-l:{{BK_L}}">
+  <section class="bl-hero wrap">
+    <div class="bl-stage">
+      <div class="book3d book3d--hero" data-book="{{BK_ID}}" data-mode="hero">
+        <img class="book3d__fallback" src="{{BK_FRONT}}" alt="{{BK_TITLE}} - front cover" />
+      </div>
+      <div class="rail" role="group" aria-label="3D book controls">
+        <div class="rail__row">
+          <span class="rail__lbl mono">Cover</span>
+          <div class="seg" role="group" aria-label="Cover variation">
+            <button type="button" class="seg__btn is-on" data-ctl="cover" data-val="a" aria-pressed="true">A</button>
+            <button type="button" class="seg__btn" data-ctl="cover" data-val="b" aria-pressed="false">B</button>
+          </div>
+          <span class="rail__lbl mono">Face</span>
+          <div class="seg" role="group" aria-label="Book face">
+            <button type="button" class="seg__btn is-on" data-ctl="face" data-val="front" aria-pressed="true">Front</button>
+            <button type="button" class="seg__btn" data-ctl="face" data-val="back" aria-pressed="false">Back</button>
+          </div>
+        </div>
+        <div class="rail__row">
+          <button type="button" class="rail__toggle is-on" data-ctl="spin" aria-pressed="true"><span class="dot" aria-hidden="true"></span>Auto-spin</button>
+          <label class="rail__range mono">Speed<input type="range" data-ctl="speed" min="0.2" max="3" step="0.1" value="1" aria-label="Spin speed"></label>
+          <label class="rail__range mono">Float<input type="range" data-ctl="float" min="0" max="0.2" step="0.01" value="0.07" aria-label="Float amplitude"></label>
+        </div>
+        <div class="rail__row">
+          <label class="rail__range mono">Light<input type="range" data-ctl="light" min="0.2" max="2.4" step="0.05" value="1.15" aria-label="Light intensity"></label>
+          <label class="rail__range mono">Angle<input type="range" data-ctl="angle" min="-180" max="180" step="5" value="35" aria-label="Light direction"></label>
+          <label class="rail__range mono">Zoom<input type="range" data-ctl="zoom" min="2.4" max="6" step="0.1" value="3.7" aria-label="Camera distance"></label>
+        </div>
+        <div class="rail__row">
+          <button type="button" class="rail__btn mono" data-ctl="reset">Reset view</button>
+          <a class="rail__btn mono" data-ctl="download" href="{{BK_FRONT}}" download>Download cover</a>
+          <span class="rail__hint mono">drag to orbit · wheel to zoom</span>
+        </div>
+      </div>
+    </div>
+    <div class="bl-copy" id="bkHeroCopy"></div>
+  </section>
+
+  <div class="buybar" id="buybar"></div>
+
+  <section class="bl-proof wrap" id="bkProof" data-reveal></section>
+
+  <section class="bl-sec wrap">
+    <div class="sec-label micro" data-reveal>What you'll learn</div>
+    <h2 class="bl-h2" data-reveal>Six things you'll walk away with</h2>
+    <div class="learn" id="bkLearn"></div>
+  </section>
+
+  <section class="bl-sec wrap">
+    <div class="sec-label micro" data-reveal>What's inside</div>
+    <h2 class="bl-h2" data-reveal>The full table of contents, honestly</h2>
+    <div class="inside">
+      <ul class="inside__list" id="bkInside"></ul>
+      <div class="inside__stats" id="bkStats"></div>
+    </div>
+    <div class="visuals" id="bkVisuals"></div>
+  </section>
+
+  <section class="bl-sec wrap">
+    <div class="sec-label micro" data-reveal>Fit</div>
+    <h2 class="bl-h2" data-reveal>Who it's for - and who it isn't</h2>
+    <div class="who">
+      <div class="who__col"><h3 class="who__h mono">For you if</h3><ul id="bkWho"></ul></div>
+      <div class="who__col who__col--not"><h3 class="who__h mono">Not for you if</h3><ul id="bkNot"></ul></div>
+    </div>
+  </section>
+
+  <section class="bl-sec wrap" id="offer">
+    <div class="sec-label micro" data-reveal>The offer</div>
+    <h2 class="bl-h2" data-reveal>One price. Everything inside.</h2>
+    <div class="offer" id="bkOffer"></div>
+  </section>
+
+  <section class="bl-sec wrap">
+    <div class="sec-label micro" data-reveal>FAQ</div>
+    <h2 class="bl-h2" data-reveal>Questions, answered straight</h2>
+    <div class="acc" id="bkFaq"></div>
+  </section>
+
+  <section class="bl-sec wrap">
+    <div class="sec-label micro" data-reveal>About the author</div>
+    <div class="author" data-reveal>
+      <div class="author__pic"><img src="/assets/hero-portrait-v2.jpg" alt="Portrait of Jordan Nwachukwu" loading="lazy" /></div>
+      <div class="author__copy">
+        <h2 class="bl-h2">Jordan Nwachukwu</h2>
+        <p>Marketer, creative technologist and founder. I build storefronts, funnels and software for Nigerian businesses - Bonita Foods, Rachy Clothing, Camille Bisou, JMK's Hair and others - from Pixelhd Studios, Lagos. These books are the playbooks I use with clients, written down plainly: what works, what it costs, and where the limits are.</p>
+        <div class="author__links">
+          <a class="btn" href="/about/" data-magnetic><span class="btn__bg" aria-hidden="true"></span><span>More about me</span><svg class="arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg></a>
+          <a class="author__soc mono" href="https://www.instagram.com/jordannwachukwu" target="_blank" rel="noopener">Instagram</a>
+          <a class="author__soc mono" href="https://www.x.com/jordanified" target="_blank" rel="noopener">X</a>
+          <a class="author__soc mono" href="https://www.linkedin.com/in/jordannwachukwu" target="_blank" rel="noopener">LinkedIn</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="bl-sec wrap">
+    <div class="sec-label micro" data-reveal>Keep reading</div>
+    <div class="nextbooks" id="bkNext"></div>
+  </section>
+</div>

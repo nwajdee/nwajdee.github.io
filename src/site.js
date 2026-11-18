@@ -16,10 +16,11 @@
   if(hasST) G.registerPlugin(window.ScrollTrigger);
   const $ = (s,c)=> (c||document).querySelector(s);
   const $$ = (s,c)=> Array.from((c||document).querySelectorAll(s));
-  const DATA = window.__JN || {imgs:{},titles:{}};
+  const DATA = window.__JN || {imgs:{},titles:{},books:{},posts:{}};
   const imgOf = id => DATA.imgs[id];
 
-  const labels={home:'Home',work:'Work',about:'About',contact:'Contact'};
+  const labels={home:'Home',work:'Work',about:'About',contact:'Contact',resources:'Resources',books:'Books',academy:'Academy',blog:'Blog'};
+  const RESFAM=['resources','books','academy','blog','book','post'];
   let current = ($('.page') && $('.page').dataset.page) || 'home';
   let transitioning=false, pendingPop=null;
   function flushPop(){ if(pendingPop){ const p=pendingPop; pendingPop=null; go(p.url,{push:false,restoreY:p.y}); } }
@@ -31,11 +32,22 @@
     if(r==='/work') return {name:'work',id:null};
     if(r==='/about') return {name:'about',id:null};
     if(r==='/contact') return {name:'contact',id:null};
+    if(r==='/resources') return {name:'resources',id:null};
+    if(r==='/resources/books') return {name:'books',id:null};
+    if(r==='/resources/academy') return {name:'academy',id:null};
+    if(r==='/resources/blog') return {name:'blog',id:null};
+    if(r.indexOf('/resources/books/')===0){ const id=r.slice(17); return DATA.books&&DATA.books[id]?{name:'book',id:id}:null; }
+    if(r.indexOf('/resources/blog/')===0){ const id=r.slice(16); return DATA.posts&&DATA.posts[id]?{name:'post',id:id}:null; }
     if(r.indexOf('/work/')===0){ const id=r.slice(6); return imgOf(id)?{name:'project',id:id}:null; }
     return null;
   }
   function pathOf(name,id){
     if(name==='project'&&id) return '/work/'+id+'/';
+    if(name==='book'&&id) return '/resources/books/'+id+'/';
+    if(name==='post'&&id) return '/resources/blog/'+id+'/';
+    if(name==='books') return '/resources/books/';
+    if(name==='academy') return '/resources/academy/';
+    if(name==='blog') return '/resources/blog/';
     if(name==='home') return '/';
     return '/'+name+'/';
   }
@@ -56,7 +68,7 @@
     const r=h.slice(2).replace(/\/+$/,'');
     if(r===''||r==='home') return '/';
     if(r.indexOf('work/')===0){ const id=r.slice(5); return imgOf(id)?'/work/'+id+'/':'/work/'; }
-    return labels[r]?'/'+r+'/':null;
+    return labels[r]?pathOf(r):null;
   }
 
   /* ============================================================
@@ -100,7 +112,7 @@
     let mx=innerWidth/2,my=innerHeight/2,rx=mx,ry=my;
     addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.transform='translate('+mx+'px,'+my+'px) translate(-50%,-50%)';clabel.style.transform='translate('+mx+'px,'+my+'px) translate(-50%,-50%)';},{passive:true});
     (function loop(){ rx+=(mx-rx)*.16; ry+=(my-ry)*.16; ring.style.transform='translate('+rx+'px,'+ry+'px) translate(-50%,-50%)'; requestAnimationFrame(loop); })();
-    const hoverSel='a,button,[role="link"],input,select,textarea,.work-row';
+    const hoverSel='a,button,[role="link"],input,select,textarea,.work-row,.book3d canvas';
     document.addEventListener('mouseover',e=>{
       const t=e.target.closest(hoverSel);
       ring.classList.toggle('is-hover',!!t);
@@ -214,7 +226,7 @@
     const view=near?near.closest('.work-row,.card__media'):null;
     clabel.classList.toggle('show',!!view);
     ring.classList.toggle('is-view',!!view);
-    const hov=near?near.closest('a,button,[role="link"],input,select,textarea,.work-row'):null;
+    const hov=near?near.closest('a,button,[role="link"],input,select,textarea,.work-row,.book3d canvas'):null;
     ring.classList.toggle('is-hover',!!hov);
   }
 
@@ -271,6 +283,17 @@
   }
   menuBtn.addEventListener('click',()=>menuOpen?closeMenu():openMenu());
   addEventListener('keydown',e=>{ if(e.key==='Escape'&&menuOpen)closeMenu(); });
+
+  /* ---------- header resources dropdown ---------- */
+  (function(){
+    const drop=$('#navDrop'), caret=$('#navDropCaret'); if(!drop||!caret) return;
+    function setOpen(v){ drop.classList.toggle('open',v); caret.setAttribute('aria-expanded',String(v)); }
+    caret.addEventListener('click',e=>{ e.stopPropagation(); setOpen(!drop.classList.contains('open')); });
+    drop.addEventListener('click',e=>{ if(e.target.closest('a')) setOpen(false); });
+    document.addEventListener('click',e=>{ if(!drop.contains(e.target)) setOpen(false); });
+    document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&drop.classList.contains('open')){ setOpen(false); caret.focus({preventScroll:true}); } });
+    drop.addEventListener('focusout',e=>{ if(e.relatedTarget&&!drop.contains(e.relatedTarget)) setOpen(false); });
+  })();
 
   /* ============================================================
      THEME (dark default / light) — persisted, pre-paint boot in <head>
@@ -441,6 +464,241 @@
     form.addEventListener('input',e=>{const f=e.target.closest('.field'); if(f&&f.classList.contains('invalid'))validateField(f);});
   }
 
+  /* ============================================================
+     3D BOOK VIEWER — three.js lazy module, one damped rAF per
+     scene, IO pause offscreen, pixel-ratio cap, full dispose.
+     ============================================================ */
+  let threeP=null;
+  function loadThree(){ if(!threeP) threeP=import('/assets/vendor/three.module.min.js'); return threeP; }
+  const clampN=(v,a,b)=>Math.min(b,Math.max(a,v));
+
+  function BookScene(el,meta,mode){
+    const hero=mode==='hero';
+    const defs={dist:hero?3.7:4.3,spin:!reduce,speed:hero?1:.6,float:reduce?0:(hero?.07:.05),light:1.15,angle:35};
+    let cover='a', spin=defs.spin, speed=defs.speed, floatAmp=defs.float, lightI=defs.light, angle=defs.angle;
+    const target={ry:.5,rx:-.06,dist:defs.dist}, cur={ry:.5,rx:-.06,dist:defs.dist};
+    let dragging=false, dirty=true, ready=false, dead=false, inView=true, raf=0;
+    let THREE,renderer,scene,camera,mesh,key,amb,ro,io,canvas,geoShared;
+    const texCache={}, mats=[];
+    let frontMat,backMat;
+
+    function spineTexture(){
+      const c=document.createElement('canvas'); c.width=128; c.height=1024;
+      const x=c.getContext('2d');
+      x.fillStyle=meta.c[0]; x.fillRect(0,0,128,1024);
+      x.fillStyle='#141517';
+      x.save(); x.translate(64,512); x.rotate(Math.PI/2);
+      x.font='700 46px "Hanken Grotesk",sans-serif'; x.textAlign='center'; x.textBaseline='middle';
+      x.fillText(meta.t.toUpperCase(),0,0,900);
+      x.restore();
+      x.beginPath(); x.arc(64,60,10,0,7); x.fill();
+      const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; return t;
+    }
+    function pagesTexture(){
+      const c=document.createElement('canvas'); c.width=256; c.height=256;
+      const x=c.getContext('2d');
+      x.fillStyle='#F2EEE4'; x.fillRect(0,0,256,256);
+      x.fillStyle='rgba(0,0,0,.09)';
+      for(let y=0;y<256;y+=3) x.fillRect(0,y,256,1);
+      const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; return t;
+    }
+    function coverTex(url){
+      if(texCache[url]) return texCache[url];
+      const t=new THREE.TextureLoader().load(url,()=>{dirty=true;});
+      t.colorSpace=THREE.SRGBColorSpace;
+      t.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());
+      texCache[url]=t; return t;
+    }
+    function applyCover(){ if(!ready)return; frontMat.map=coverTex(meta[cover][0]); backMat.map=coverTex(meta[cover][1]); frontMat.needsUpdate=true; backMat.needsUpdate=true; dirty=true; }
+    function applyLight(){ if(!ready)return; const r=angle*Math.PI/180; key.position.set(Math.sin(r)*3.2,2.1,Math.cos(r)*3.2); key.intensity=1.15*lightI; amb.intensity=.5*lightI; dirty=true; }
+
+    function init(T){
+      if(dead) return;
+      THREE=T;
+      renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+      renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.75));
+      renderer.setSize(el.clientWidth||300,el.clientHeight||300,false);
+      renderer.outputColorSpace=THREE.SRGBColorSpace;
+      renderer.toneMapping=THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure=1.06;
+      canvas=renderer.domElement;
+      canvas.setAttribute('aria-label',meta.t+' - interactive 3D book. Drag to orbit, scroll to zoom.');
+      canvas.setAttribute('role','img');
+      el.appendChild(canvas);
+      scene=new THREE.Scene();
+      camera=new THREE.PerspectiveCamera(38,(el.clientWidth||300)/(el.clientHeight||300),.1,50);
+      camera.position.set(0,.12,cur.dist);
+      amb=new THREE.AmbientLight(0xffffff,.5*lightI);
+      key=new THREE.DirectionalLight(0xffffff,1.15*lightI);
+      const rim=new THREE.DirectionalLight(0xbfd4ff,.55); rim.position.set(-2.5,1.5,-3);
+      const fill=new THREE.DirectionalLight(0xfff2e0,.3); fill.position.set(-3,-.5,2);
+      scene.add(amb,key,rim,fill);
+      if(!BookScene.geo) BookScene.geo=new THREE.BoxGeometry(1.4,2.1,.18);
+      geoShared=BookScene.geo;
+      const spine=spineTexture(), pages=pagesTexture();
+      texCache.__spine=spine; texCache.__pages=pages;
+      const edgeMat=new THREE.MeshStandardMaterial({map:pages,roughness:.9});
+      const spineMat=new THREE.MeshStandardMaterial({map:spine,roughness:.6});
+      frontMat=new THREE.MeshStandardMaterial({roughness:.5,metalness:.02});
+      backMat=new THREE.MeshStandardMaterial({roughness:.5,metalness:.02});
+      mats.push(edgeMat,spineMat,frontMat,backMat);
+      mesh=new THREE.Mesh(geoShared,[edgeMat,spineMat,edgeMat,edgeMat,frontMat,backMat]);
+      scene.add(mesh);
+      ready=true;
+      applyCover(); applyLight();
+      /* prefetch the other cover variation once the first frame is up */
+      setTimeout(()=>{ if(!dead){ coverTex(meta[cover==='a'?'b':'a'][0]); coverTex(meta[cover==='a'?'b':'a'][1]); } },600);
+
+      let lx=0,ly=0;
+      canvas.addEventListener('pointerdown',e=>{ dragging=true; lx=e.clientX; ly=e.clientY; try{canvas.setPointerCapture(e.pointerId);}catch(_){} });
+      canvas.addEventListener('pointermove',e=>{ if(!dragging)return; target.ry+=(e.clientX-lx)*.0075; target.rx=clampN(target.rx+(e.clientY-ly)*.005,-.55,.55); lx=e.clientX; ly=e.clientY; dirty=true; });
+      const endDrag=()=>{dragging=false;};
+      canvas.addEventListener('pointerup',endDrag);
+      canvas.addEventListener('pointercancel',endDrag);
+      canvas.addEventListener('wheel',e=>{ e.preventDefault(); e.stopPropagation(); target.dist=clampN(target.dist+e.deltaY*.0022,2.4,6); dirty=true; },{passive:false});
+
+      ro=new ResizeObserver(()=>{ const w=el.clientWidth,h=el.clientHeight; if(!w||!h)return; renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix(); dirty=true; });
+      ro.observe(el);
+      if('IntersectionObserver' in window){
+        io=new IntersectionObserver(es=>{es.forEach(en=>{inView=en.isIntersecting; if(inView)dirty=true;});},{threshold:.02});
+        io.observe(el);
+      }
+      el.classList.add('book3d--live');
+      raf=requestAnimationFrame(frame);
+    }
+    function frame(t){
+      if(dead) return;
+      raf=requestAnimationFrame(frame);
+      if(!inView||document.hidden) return;
+      const time=t*.001;
+      if(spin&&!dragging) target.ry+=speed*.0045;
+      cur.ry+=(target.ry-cur.ry)*.085;
+      cur.rx+=(target.rx-cur.rx)*.085;
+      cur.dist+=(target.dist-cur.dist)*.1;
+      mesh.rotation.y=cur.ry;
+      mesh.rotation.x=cur.rx+(floatAmp?Math.sin(time*.7)*.02:0);
+      mesh.position.y=floatAmp?Math.sin(time*1.1)*floatAmp:0;
+      camera.position.z=cur.dist;
+      const moving=dragging||spin||floatAmp>0||Math.abs(target.ry-cur.ry)>1e-4||Math.abs(target.rx-cur.rx)>1e-4||Math.abs(target.dist-cur.dist)>1e-3;
+      if(moving||dirty){ renderer.render(scene,camera); dirty=false; }
+    }
+    loadThree().then(init).catch(()=>{
+      el.classList.add('book3d--flat');
+      const ctl=el.parentElement&&(el.parentElement.querySelector('.rail')||el.parentElement.querySelector('.shelf-ctl'));
+      if(ctl){ ctl.style.opacity=.4; ctl.style.pointerEvents='none'; ctl.setAttribute('aria-disabled','true'); }
+    });
+
+    return {
+      setCover(v){ cover=v; applyCover(); },
+      setFace(f){ const two=Math.PI*2; target.ry=f==='front'?Math.round(cur.ry/two)*two:Math.round((cur.ry-Math.PI)/two)*two+Math.PI; target.rx=-.06; spin=false; dirty=true; },
+      toggleSpin(){ spin=!spin; dirty=true; return spin; },
+      setSpin(v){ spin=v; dirty=true; },
+      setSpeed(v){ speed=v; },
+      setFloat(v){ floatAmp=v; dirty=true; },
+      setLight(v){ lightI=v; applyLight(); },
+      setAngle(v){ angle=v; applyLight(); },
+      setZoom(v){ target.dist=clampN(v,2.4,6); dirty=true; },
+      reset(){ cover='a'; spin=defs.spin; speed=defs.speed; floatAmp=defs.float; lightI=defs.light; angle=defs.angle; target.ry=.5; target.rx=-.06; target.dist=defs.dist; applyCover(); applyLight(); dirty=true; return this.state(); },
+      state(){ return {cover,spin,speed,float:floatAmp,light:lightI,angle,dist:target.dist}; },
+      dispose(){
+        dead=true; cancelAnimationFrame(raf);
+        if(ro)ro.disconnect(); if(io)io.disconnect();
+        Object.keys(texCache).forEach(k=>{ if(texCache[k]&&texCache[k].dispose)texCache[k].dispose(); });
+        mats.forEach(m=>m.dispose());
+        if(renderer){ renderer.dispose(); try{renderer.forceContextLoss();}catch(_){} }
+        if(canvas)canvas.remove();
+        el.classList.remove('book3d--live');
+      }
+    };
+  }
+
+  function bindBookControls(el,api,meta,mode){
+    const scope=el.parentElement&&(el.parentElement.querySelector('.rail')||el.parentElement.querySelector('.shelf-ctl'));
+    if(!scope) return;
+    const ac=new AbortController(), sig={signal:ac.signal};
+    const segs=$$('.seg__btn',scope), spinBtn=$('[data-ctl="spin"]',scope),
+          ranges={speed:$('[data-ctl="speed"]',scope),float:$('[data-ctl="float"]',scope),light:$('[data-ctl="light"]',scope),angle:$('[data-ctl="angle"]',scope),zoom:$('[data-ctl="zoom"]',scope)},
+          resetBtn=$('[data-ctl="reset"]',scope), dl=$('[data-ctl="download"]',scope);
+    let face='front';
+    function syncSeg(ctl,val){ segs.forEach(b=>{ if(b.dataset.ctl!==ctl)return; const on=b.dataset.val===val; b.classList.toggle('is-on',on); b.setAttribute('aria-pressed',String(on)); }); }
+    function syncSpin(on){ if(!spinBtn)return; spinBtn.classList.toggle('is-on',on); spinBtn.setAttribute('aria-pressed',String(on)); }
+    function syncDownload(){ if(dl)dl.setAttribute('href',meta[api.state().cover][0]); }
+    segs.forEach(b=>b.addEventListener('click',()=>{
+      const ctl=b.dataset.ctl, val=b.dataset.val;
+      if(ctl==='cover'){ api.setCover(val); syncSeg('cover',val); syncDownload(); }
+      if(ctl==='face'){ face=val; api.setFace(val); syncSeg('face',val); syncSpin(false); }
+    },sig));
+    const flip=$('[data-ctl="face"]:not(.seg__btn)',scope);
+    if(flip) flip.addEventListener('click',()=>{ face=face==='front'?'back':'front'; api.setFace(face); syncSpin(false); },sig);
+    if(spinBtn) spinBtn.addEventListener('click',()=>syncSpin(api.toggleSpin()),sig);
+    Object.keys(ranges).forEach(k=>{ const r=ranges[k]; if(!r)return;
+      r.addEventListener('input',()=>{ const v=parseFloat(r.value);
+        if(k==='speed')api.setSpeed(v); if(k==='float')api.setFloat(v); if(k==='light')api.setLight(v); if(k==='angle')api.setAngle(v); if(k==='zoom')api.setZoom(v);
+      },sig);
+    });
+    if(resetBtn) resetBtn.addEventListener('click',()=>{
+      const s=api.reset(); face='front';
+      syncSeg('cover',s.cover); syncSeg('face','front'); syncSpin(s.spin); syncDownload();
+      if(ranges.speed)ranges.speed.value=s.speed; if(ranges.float)ranges.float.value=s.float;
+      if(ranges.light)ranges.light.value=s.light; if(ranges.angle)ranges.angle.value=s.angle; if(ranges.zoom)ranges.zoom.value=s.dist;
+    },sig);
+    syncDownload();
+    syncSpin(api.state().spin);
+    pageCleanup.push(()=>ac.abort());
+  }
+
+  function initBookScopes(page){
+    $$('.book3d',page).forEach(el=>{
+      const meta=DATA.books&&DATA.books[el.dataset.book]; if(!meta) return;
+      const mode=el.dataset.mode||'shelf';
+      const api=BookScene(el,meta,mode);
+      bindBookControls(el,api,meta,mode);
+      pageCleanup.push(()=>api.dispose());
+    });
+  }
+
+  /* ---------- FAQ accordion ---------- */
+  function bindAcc(scope){
+    if(!scope) return;
+    const ac=new AbortController();
+    scope.addEventListener('click',e=>{
+      const q=e.target.closest('.acc__q'); if(!q)return;
+      const open=q.closest('.acc__item').classList.toggle('open');
+      q.setAttribute('aria-expanded',String(open));
+    },{signal:ac.signal});
+    pageCleanup.push(()=>ac.abort());
+  }
+
+  /* ---------- sticky buy bar (hero out of view, footer out of view) ---------- */
+  function initBuybar(page){
+    const bar=$('#buybar',page), hero=$('.bl-hero',page), footer=$('#footer');
+    if(!bar||!hero) return;
+    let heroIn=true, footIn=false;
+    const update=()=>bar.classList.toggle('show',!heroIn&&!footIn);
+    const io=new IntersectionObserver(es=>{
+      es.forEach(en=>{ if(en.target===hero)heroIn=en.isIntersecting; else footIn=en.isIntersecting; });
+      update();
+    },{threshold:.06});
+    io.observe(hero); if(footer)io.observe(footer);
+    pageCleanup.push(()=>{ io.disconnect(); bar.classList.remove('show'); });
+  }
+
+  /* ---------- blog topic filter ---------- */
+  function bindBlogFilter(page){
+    const chips=$$('.chip',page), cards=$$('.post-card',page), empty=$('#postsEmpty',page);
+    if(!chips.length) return;
+    const ac=new AbortController();
+    chips.forEach(ch=>ch.addEventListener('click',()=>{
+      chips.forEach(c=>{ const on=c===ch; c.classList.toggle('is-on',on); c.setAttribute('aria-pressed',String(on)); });
+      const f=ch.dataset.filter; let n=0;
+      cards.forEach(c=>{ const show=f==='all'||c.dataset.cat===f; c.classList.toggle('is-hidden',!show); if(show)n++; });
+      if(empty)empty.hidden=n>0;
+      if(hasST)window.ScrollTrigger.refresh();
+      if(lenis)lenis.resize();
+    },{signal:ac.signal}));
+    pageCleanup.push(()=>ac.abort());
+  }
+
   function initPage(){
     const page=$('.page.active'); if(!page) return;
     current=page.dataset.page||'home';
@@ -469,6 +727,10 @@
       }
     }
     if(current==='contact') bindForm();
+    if(current==='books'||current==='book') initBookScopes(page);
+    if(current==='book'){ initBuybar(page); bindAcc($('#bkFaq',page)); }
+    if(current==='academy') bindAcc($('#acadFaq',page));
+    if(current==='blog') bindBlogFilter(page);
     if(current==='project'){
       /* case videos: play in view, pause out of view; click / key toggles */
       const vids=$$('video[data-casevideo]',page);
@@ -578,14 +840,14 @@
     transitioning=true;
     const startY=lenis?lenis.scroll:window.scrollY;
     const docP=fetchDoc(url);
-    const label=route.name==='project'?(DATA.titles[route.id]||'Work'):(labels[route.name]||'');
+    const label=route.name==='project'?(DATA.titles[route.id]||'Work'):route.name==='book'?((DATA.books[route.id]||{}).t||'Books'):route.name==='post'?((DATA.posts[route.id]||{}).t||'Blog'):(labels[route.name]||'');
 
     const swap=doc=>{
       const newPage=doc.querySelector('.page');
       destroyPage();
       $('#main').replaceChildren(document.importNode(newPage,true));
       current=newPage.dataset.page||route.name;
-      const navName=current==='project'?'work':current;
+      const navName=current==='project'?'work':(RESFAM.indexOf(current)>-1?'resources':current);
       $$('.header__link').forEach(a=>a.classList.toggle('active',a.dataset.route===navName));
       syncHead(doc);
       if(push&&!pendingPop){
