@@ -884,3 +884,12 @@ html[data-theme="light"] .post[data-cat="Japa"]{--pc:#0B3D2E}
   .camp__status .dot{animation:none}
   .book3d::before{filter:none}
 }
+
+/* ---------- centered heads ---------- */
+.res-head,.work-head,.about-head,.notfound,.post__head,.bl-copy{text-align:center}
+.case-title,.intro__big{text-align:center;margin-inline:auto}
+.res-head .sec-label,.work-head .sec-label,.about-head .sec-label,.contact>.sec-label,.notfound .sec-label,.bl-sec>.sec-label,.bl-copy .sec-label{justify-content:center}
+.contact>.sec-label,.contact__title,.contact__sub{text-align:center}
+.res-head__sub,.work-head__sub,.about-head__title,.contact__title,.contact__sub,.notfound__msg,.bl-lede{margin-inline:auto}
+.post__meta,.post__byline,.chips,.notfound__cta,.bl-cta,.bl-facts{justify-content:center}
+.bl-sec>.bl-h2{text-align:center}
