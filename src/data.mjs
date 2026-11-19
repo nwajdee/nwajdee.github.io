@@ -5,7 +5,7 @@
 export const SITE = {
   origin: 'https://nwajdee.github.io',
   name: 'Jordan Nwachukwu',
-  role: 'Creative Technologist & Founder',
+  role: 'Designer, Developer & Marketer',
   portrait: '/assets/hero-portrait-v2.jpg'
 };
 
