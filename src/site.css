@@ -248,7 +248,7 @@ section{position:relative}
   .hero__pill-text{display:none}
   .hero__pill-globe{width:67px;height:67px;background:transparent}
   .hero__pill-globe .globe{width:56.7%;height:56.7%}
-  .hero__role{left:1.25rem;right:auto;top:auto;bottom:6.75rem;text-align:left}
+  .hero__role{left:1.25rem;right:auto;top:auto;bottom:1.5rem;text-align:left}
   .hero__role .arr{top:calc(-.6rem - 26px);width:26px;height:26px}
   .hero__role p{font-size:clamp(1.2rem,5vw,2rem);line-height:1.05;max-width:60vw}
 }
