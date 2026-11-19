@@ -244,11 +244,11 @@ section{position:relative}
   /* shared tablet→phone layout: marquee centered, pill collapses to globe right,
      role label moved left */
   .hero__name{font-size:clamp(4rem,24vw,7rem);top:50%;bottom:auto;transform:translateY(-50%)}
-  .hero__pill{top:auto;bottom:1.5rem;left:auto;right:var(--pad);gap:0;padding:0;background:transparent;height:auto;min-width:0;font-size:.8rem}
+  .hero__pill{top:auto;bottom:1rem;left:auto;right:var(--pad);gap:0;padding:0;background:transparent;height:auto;min-width:0;font-size:.8rem}
   .hero__pill-text{display:none}
   .hero__pill-globe{width:67px;height:67px;background:transparent}
   .hero__pill-globe .globe{width:56.7%;height:56.7%}
-  .hero__role{left:1.25rem;right:auto;top:auto;bottom:1.5rem;text-align:left}
+  .hero__role{left:1.25rem;right:auto;top:auto;bottom:1rem;text-align:left}
   .hero__role .arr{top:calc(-.6rem - 26px);width:26px;height:26px}
   .hero__role p{font-size:clamp(1.2rem,5vw,2rem);line-height:1.05;max-width:60vw}
 }
