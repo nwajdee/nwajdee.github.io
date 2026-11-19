@@ -241,14 +241,17 @@ section{position:relative}
 .hero__role p{margin:0;font-size:clamp(1.2rem,2.2vw,2rem);line-height:1.25;font-weight:500}
 @media(max-width:820px){
   .hero{min-height:75svh}
-  .hero__name{font-size:28vw;top:50%;bottom:auto;transform:translateY(-50%)}
+  /* reference caps the marquee at 144px across the whole phone→tablet range
+     (36.9vw @390px), it does not keep growing with the viewport */
+  .hero__name{font-size:clamp(6rem,36.9vw,9rem);top:50%;bottom:auto;transform:translateY(-50%)}
   /* black pill collapses to just the spinning globe on the right */
-  .hero__pill{top:auto;bottom:clamp(4.5rem,12vw,7rem);left:auto;right:var(--pad);gap:0;padding:0;background:transparent;height:auto;min-width:0;font-size:.8rem}
+  .hero__pill{top:auto;bottom:6.75rem;left:auto;right:var(--pad);gap:0;padding:0;background:transparent;height:auto;min-width:0;font-size:.8rem}
   .hero__pill-text{display:none}
-  .hero__pill-globe{width:clamp(48px,14vw,72px);height:clamp(48px,14vw,72px);background:transparent}
+  .hero__pill-globe{width:67px;height:67px;background:transparent}
+  .hero__pill-globe .globe{width:56.7%;height:56.7%}
   /* role label: moved left, scaled up to span > half viewport */
-  .hero__role{left:var(--pad);right:auto;top:auto;bottom:clamp(4.5rem,12vw,7rem);text-align:left}
-  .hero__role .arr{top:calc(-.6rem - clamp(22px,5.5vw,34px));width:clamp(22px,5.5vw,34px);height:clamp(22px,5.5vw,34px)}
+  .hero__role{left:1.25rem;right:auto;top:auto;bottom:14.5rem;text-align:left}
+  .hero__role .arr{top:calc(-.6rem - 26px);width:26px;height:26px}
   .hero__role p{font-size:clamp(1.5rem,6vw,2.4rem);line-height:1.05;max-width:60vw}
 }
 @media(max-width:374px){
