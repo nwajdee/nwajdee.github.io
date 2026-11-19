@@ -244,7 +244,7 @@ section{position:relative}
   /* shared tablet→phone layout: marquee centered, pill collapses to globe right,
      role label moved left */
   .hero__name{font-size:clamp(4rem,24vw,7rem);top:50%;bottom:auto;transform:translateY(-50%)}
-  .hero__pill{top:auto;bottom:6.75rem;left:auto;right:var(--pad);gap:0;padding:0;background:transparent;height:auto;min-width:0;font-size:.8rem}
+  .hero__pill{top:auto;bottom:1.5rem;left:auto;right:var(--pad);gap:0;padding:0;background:transparent;height:auto;min-width:0;font-size:.8rem}
   .hero__pill-text{display:none}
   .hero__pill-globe{width:67px;height:67px;background:transparent}
   .hero__pill-globe .globe{width:56.7%;height:56.7%}
