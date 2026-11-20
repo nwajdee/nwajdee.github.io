@@ -25,6 +25,48 @@
 <script>(function(){try{if(sessionStorage.getItem('jn-preloaded')==='1')document.documentElement.classList.add('preloaded');}catch(e){}})();</script>
 <link rel="stylesheet" href="/assets/site.css" />
 <noscript><style>.preloader{display:none}.cursor,.cursor-ring,.cursor-label{display:none}[data-reveal]{opacity:1!important;transform:none!important}.intro__big .w{opacity:1!important}.page{display:block!important}</style></noscript>
+
+	<!-- ANALYTICS & PIXELS — replace placeholder IDs with your own -->
+	<!-- Google Analytics 4: get ID at analytics.google.com (format: G-XXXXXXXXXX) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+	  gtag('config', 'G-XXXXXXXXXX');
+	</script>
+
+	<!-- Meta Pixel: get Pixel ID at business.facebook.com -->
+	<script>
+	  !function(f,b,e,v,n,t,s)
+	  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+	  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+	  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+	  n.queue=[];t=b.createElement(e);t.async=!0;
+	  t.src=v;s=b.getElementsByTagName(e)[0];
+	  s.parentNode.insertBefore(t,s)}(window, document,'script',
+	  'https://connect.facebook.net/en_US/fbevents.js');
+	  fbq('init', 'YOUR_META_PIXEL_ID');
+	  fbq('track', 'PageView');
+	</script>
+	<noscript><img height="1" width="1" style="display:none"
+	  src="https://www.facebook.com/tr?id=YOUR_META_PIXEL_ID&ev=PageView&noscript=1"
+	/></noscript>
+
+	<!-- TikTok Pixel: get pixel code at ads.tiktok.com -->
+	<script>
+	  !function (w, d, t, s, n) {
+	  w.tiktok = w.tiktok || []; w.tiktok.push = w.tiktok.push;
+	  w.tiktok.queue = w.tiktok.queue || [];
+	  t = d.createElement(s); t.async = !0; t.src = n;
+	  s = d.getElementsByTagName(s)[0]; s.parentNode.insertBefore(t, s);
+	  }(window, document, 'script', 'https://www.tiktok.com/pixel.js');
+	  ttq.init && ttq.init('YOUR_TIKTOK_PIXEL_ID', {});
+	  ttq.track && ttq.track('PageView');
+	</script>
+
+	<!-- Google Ads: conversion tag from ads.google.com — paste full snippet here when ready -->
+	<!-- Google Ads conversion tracking -->
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
